@@ -51,8 +51,8 @@ git commit -m "feat: complete freelance-ready gym management with Google sign-in
 # 4. Set default branch to main
 git branch -M main
 
-# 5. Connect to your GitHub repository (replace with your repo URL)
-git remote add origin https://github.com/your-username/gym-management.git
+# 5. Connect to your GitHub repository
+git remote add origin https://github.com/arpitrai38/gms-frontened.git
 
 # 6. Push to GitHub
 git push -u origin main
