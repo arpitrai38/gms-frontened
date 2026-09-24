@@ -425,7 +425,7 @@ app.post('/api/auth/google', async (req, res) => {
 // -------------------------------------------------------------
 app.post('/api/auth/forgot-password', async (req, res) => {
   try {
-    const { email, role } = req.body;
+    const { email, role, targetEmail: providedEmail } = req.body;
     if (!email || !email.trim()) {
       return res.status(400).json({ success: false, message: 'Please provide your registered email address or mobile number' });
     }
@@ -433,94 +433,78 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     const input = email.trim();
     const isEmail = input.includes('@');
 
-    // Check if account exists in GymUser (Admin or Trainer) or Member
     let recipientName = 'User';
     let userRole = role || 'Member';
-    let accountFound = false;
     let targetEmail = '';
 
     if (isEmail) {
       const cleanEmail = input.toLowerCase();
 
-      // If specific role requested, check that role first
-      if (role === 'Member') {
-        const member = await Member.findOne({ email: cleanEmail });
-        if (member) {
-          accountFound = true;
-          recipientName = member.name;
-          userRole = 'Member';
-          targetEmail = member.email;
-        }
-      } else if (role === 'Trainer') {
-        const trainer = await GymUser.findOne({ email: cleanEmail, role: 'Trainer' });
-        if (trainer) {
-          accountFound = true;
-          recipientName = trainer.userName;
-          userRole = 'Trainer';
-          targetEmail = trainer.email;
-        }
-      } else if (role === 'Admin') {
-        const adminUser = await GymUser.findOne({ email: cleanEmail, role: 'Admin' });
-        if (adminUser) {
-          accountFound = true;
-          recipientName = adminUser.userName;
-          userRole = 'Admin';
-          targetEmail = adminUser.email;
-        }
-      }
+      // Look up in GymUser or Member
+      const gymUser = await GymUser.findOne({ email: cleanEmail });
+      const member = await Member.findOne({ email: cleanEmail });
 
-      // If still not found by specified role, check all collections
-      if (!accountFound) {
-        const gymUser = await GymUser.findOne({ email: cleanEmail });
-        if (gymUser) {
-          accountFound = true;
-          recipientName = gymUser.userName;
-          userRole = gymUser.role;
-          targetEmail = gymUser.email;
-        } else {
-          const member = await Member.findOne({ email: cleanEmail });
-          if (member) {
-            accountFound = true;
-            recipientName = member.name;
-            userRole = 'Member';
-            targetEmail = member.email;
-          }
-        }
+      if (gymUser) {
+        recipientName = gymUser.userName;
+        userRole = gymUser.role;
+        targetEmail = gymUser.email;
+      } else if (member) {
+        recipientName = member.name;
+        userRole = 'Member';
+        targetEmail = member.email;
+      } else {
+        // Universal access: allow new users to receive OTP and set password
+        recipientName = cleanEmail.split('@')[0];
+        userRole = role || 'Admin';
+        targetEmail = cleanEmail;
       }
     } else {
       // Lookup by mobile / phone
       const member = await Member.findOne({ mobileNo: input });
+      const gymUser = await GymUser.findOne({ phone: input });
+
       if (member) {
-        accountFound = true;
         recipientName = member.name;
         userRole = 'Member';
-        targetEmail = member.email || `${input}@gym.internal`;
-      } else {
-        const gymUser = await GymUser.findOne({ phone: input });
-        if (gymUser) {
-          accountFound = true;
-          recipientName = gymUser.userName;
-          userRole = gymUser.role;
-          targetEmail = gymUser.email;
+
+        if (member.email && member.email.includes('@')) {
+          targetEmail = member.email;
+        } else if (providedEmail && providedEmail.includes('@')) {
+          member.email = providedEmail.toLowerCase().trim();
+          await member.save();
+          targetEmail = member.email;
+        } else {
+          return res.json({
+            success: false,
+            requiresEmail: true,
+            message: `Account found for ${member.name}, but no email address is linked. Please provide your Google email address below to receive the OTP.`
+          });
         }
+      } else if (gymUser) {
+        recipientName = gymUser.userName;
+        userRole = gymUser.role;
+        targetEmail = gymUser.email;
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: `No registered account found with mobile number "${input}". Please check your number or enter your Google email address.`
+        });
       }
     }
 
-    if (!accountFound) {
-      return res.status(404).json({
-        success: false,
-        message: `No registered account found for "${input}". If this is your first time, please click "Continue with Google" on the login screen to activate your account.`
-      });
-    }
-
-    const cleanEmail = targetEmail.toLowerCase();
+    const cleanEmail = targetEmail.toLowerCase().trim();
 
     // Generate secure 6-digit OTP code
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    // Remove any previous active OTPs for this email
-    await Otp.deleteMany({ email: cleanEmail });
+    // Remove any previous active OTPs for this email and input
+    await Otp.deleteMany({
+      $or: [
+        { email: cleanEmail },
+        { email: input.toLowerCase() }
+      ]
+    });
 
     // Store new OTP in DB
     await Otp.create({
@@ -530,15 +514,26 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       expiresAt
     });
 
-    // Send email via nodemailer service (logs to console + sends via SMTP if configured)
-    await sendOtpEmail(cleanEmail, otpCode, recipientName);
+    // If input was a mobile number, also save alias OTP record for mobile lookup
+    if (!isEmail) {
+      await Otp.create({
+        email: input.toLowerCase(),
+        otp: otpCode,
+        role: userRole,
+        expiresAt
+      });
+    }
+
+    // Send email via nodemailer service
+    const emailResult = await sendOtpEmail(cleanEmail, otpCode, recipientName);
 
     res.json({
       success: true,
       message: `A 6-digit OTP has been sent to ${cleanEmail}. Please enter it below to set your new password.`,
       email: cleanEmail,
       role: userRole,
-      devOtp: otpCode // Included for testing and developer convenience
+      devOtp: otpCode,
+      emailSent: emailResult?.sent || false
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -552,31 +547,41 @@ app.post('/api/auth/reset-password', async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
     if (!email || !otp || !newPassword) {
-      return res.status(400).json({ success: false, message: 'Email, OTP code, and new password are required' });
+      return res.status(400).json({ success: false, message: 'Email/Mobile, OTP code, and new password are required' });
     }
 
-    const cleanEmail = email.toLowerCase().trim();
+    const cleanInput = email.toLowerCase().trim();
     const cleanOtp = otp.toString().trim();
 
     if (newPassword.trim().length < 3) {
       return res.status(400).json({ success: false, message: 'New password must be at least 3 characters long' });
     }
 
-    // Find valid OTP record
-    const otpRecord = await Otp.findOne({ email: cleanEmail, otp: cleanOtp });
+    // Find valid OTP record by email, mobile, or OTP code
+    let otpRecord = await Otp.findOne({ email: cleanInput, otp: cleanOtp });
+    if (!otpRecord) {
+      otpRecord = await Otp.findOne({ otp: cleanOtp });
+    }
+
     if (!otpRecord) {
       return res.status(400).json({ success: false, message: 'Invalid OTP code. Please double-check and try again.' });
     }
 
     if (new Date() > new Date(otpRecord.expiresAt)) {
-      await Otp.deleteMany({ email: cleanEmail });
+      await Otp.deleteMany({ otp: cleanOtp });
       return res.status(400).json({ success: false, message: 'OTP code has expired. Please request a new OTP.' });
     }
 
     let passwordUpdated = false;
 
-    // 1. Update GymUser (Admin / Trainer)
-    const gymUser = await GymUser.findOne({ email: cleanEmail });
+    // 1. Update GymUser (by email, phone, or OTP email)
+    const gymUser = await GymUser.findOne({
+      $or: [
+        { email: cleanInput },
+        { email: otpRecord.email },
+        { phone: cleanInput }
+      ]
+    });
     if (gymUser) {
       gymUser.password = newPassword.trim();
       gymUser.isFirstLogin = false;
@@ -584,21 +589,86 @@ app.post('/api/auth/reset-password', async (req, res) => {
       passwordUpdated = true;
     }
 
-    // 2. Update Member
-    const member = await Member.findOne({ email: cleanEmail });
+    // 2. Update Member (by email, mobile, or OTP email)
+    const member = await Member.findOne({
+      $or: [
+        { email: cleanInput },
+        { email: otpRecord.email },
+        { mobileNo: cleanInput }
+      ]
+    });
     if (member) {
       member.password = newPassword.trim();
       member.isFirstLogin = false;
+      if (!member.email && otpRecord.email.includes('@')) {
+        member.email = otpRecord.email;
+      }
       await member.save();
       passwordUpdated = true;
     }
 
+    // 3. If account was not in DB yet (new user activating via OTP flow)
     if (!passwordUpdated) {
-      return res.status(404).json({ success: false, message: 'Account not found for password reset' });
+      const targetRole = otpRecord.role || 'Admin';
+      const userEmail = cleanInput.includes('@') ? cleanInput : otpRecord.email;
+
+      if (targetRole === 'Member') {
+        const defaultGym = await GymUser.findOne({ role: 'Admin' });
+        await Member.create({
+          gymId: defaultGym ? defaultGym._id.toString() : 'gym_primary',
+          name: userEmail.split('@')[0],
+          email: userEmail,
+          mobileNo: `98${Math.floor(10000000 + Math.random() * 90000000)}`,
+          address: 'Self-Registered via OTP',
+          gender: 'Other',
+          membershipPlan: '1 Month Plan',
+          joiningDate: new Date().toISOString().split('T')[0],
+          nextBillDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          amountPaid: 1000,
+          status: 'Active',
+          password: newPassword.trim(),
+          isFirstLogin: false
+        });
+        passwordUpdated = true;
+      } else if (targetRole === 'Trainer') {
+        const defaultGym = await GymUser.findOne({ role: 'Admin' });
+        await GymUser.create({
+          gymId: defaultGym ? defaultGym._id.toString() : 'gym_primary',
+          userName: userEmail.split('@')[0],
+          gymName: defaultGym ? defaultGym.gymName : 'IronPulse Fitness Club',
+          email: userEmail,
+          role: 'Trainer',
+          password: newPassword.trim(),
+          isFirstLogin: false
+        });
+        passwordUpdated = true;
+      } else {
+        const newGym = await GymUser.create({
+          userName: userEmail.split('@')[0],
+          gymName: `${userEmail.split('@')[0]}'s Fitness Club`,
+          email: userEmail,
+          role: 'Admin',
+          password: newPassword.trim(),
+          isFirstLogin: false
+        });
+        await Membership.create([
+          { gymId: newGym._id.toString(), title: '1 Month Plan', months: 1, price: 1000, description: 'Standard monthly gym access' },
+          { gymId: newGym._id.toString(), title: '3 Months Plan', months: 3, price: 2500, description: 'Quarterly training with free locker' },
+          { gymId: newGym._id.toString(), title: '6 Months Plan', months: 6, price: 4500, description: 'Half-yearly package with trainer' },
+          { gymId: newGym._id.toString(), title: '1 Year Plan', months: 12, price: 8000, description: 'Annual VIP package with free protein' }
+        ]);
+        passwordUpdated = true;
+      }
     }
 
-    // Invalidate OTP after successful usage
-    await Otp.deleteMany({ email: cleanEmail });
+    // Invalidate used OTPs
+    await Otp.deleteMany({
+      $or: [
+        { email: cleanInput },
+        { email: otpRecord.email },
+        { otp: cleanOtp }
+      ]
+    });
 
     res.json({
       success: true,

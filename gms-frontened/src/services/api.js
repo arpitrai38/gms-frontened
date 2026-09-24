@@ -69,10 +69,10 @@ export const authAPI = {
       method: 'POST',
       body: JSON.stringify(googleData)
     }),
-  forgotPassword: (email, role) =>
+  forgotPassword: (email, role, targetEmail) =>
     request('/auth/forgot-password', {
       method: 'POST',
-      body: JSON.stringify({ email, role })
+      body: JSON.stringify({ email, role, targetEmail })
     }),
   resetPassword: (resetData) =>
     request('/auth/reset-password', {

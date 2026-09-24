@@ -8,12 +8,17 @@ const createTransporter = () => {
   if (user && pass) {
     const cleanPass = pass.replace(/\s+/g, ''); // Handles 16-character Google App Passwords with or without spaces
 
-    // If it's a Gmail address or default smtp
+    // For Gmail / default: use direct secure SSL on port 465 (reliable on Render & cloud)
     if (user.endsWith('@gmail.com') || !process.env.SMTP_HOST || process.env.SMTP_HOST === 'smtp.gmail.com') {
       return {
         transporter: nodemailer.createTransport({
-          service: 'gmail',
-          auth: { user, pass: cleanPass }
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: { user, pass: cleanPass },
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 15000
         }),
         sender: user
       };
@@ -24,7 +29,10 @@ const createTransporter = () => {
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
         secure: process.env.SMTP_SECURE === 'true',
-        auth: { user, pass: cleanPass }
+        auth: { user, pass: cleanPass },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000
       }),
       sender: user
     };

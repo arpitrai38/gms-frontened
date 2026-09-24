@@ -15,6 +15,10 @@ export const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', initia
   const [devOtpHint, setDevOtpHint] = useState('');
   const [countdown, setCountdown] = useState(60);
 
+  // For members without email on file
+  const [linkEmail, setLinkEmail] = useState('');
+  const [needsEmail, setNeedsEmail] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       setStep(1);
@@ -27,6 +31,8 @@ export const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', initia
       setSuccessMsg('');
       setDevOtpHint('');
       setCountdown(60);
+      setLinkEmail('');
+      setNeedsEmail(false);
     }
   }, [isOpen, initialEmail, initialRole]);
 
@@ -47,7 +53,12 @@ export const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', initia
   const handleSendOtp = async (e) => {
     e?.preventDefault();
     if (!email || !email.trim()) {
-      setErrorMsg('Please enter your registered email address.');
+      setErrorMsg('Please enter your registered email address or mobile number.');
+      return;
+    }
+
+    if (needsEmail && (!linkEmail || !linkEmail.includes('@'))) {
+      setErrorMsg('Please provide a valid Google email address.');
       return;
     }
 
@@ -55,11 +66,20 @@ export const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', initia
     setSuccessMsg('');
     setLoading(true);
 
-    const res = await authAPI.forgotPassword(email.trim(), role);
+    const res = await authAPI.forgotPassword(email.trim(), role, linkEmail.trim());
     setLoading(false);
+
+    if (res.requiresEmail) {
+      setNeedsEmail(true);
+      setErrorMsg(res.message);
+      return;
+    }
 
     if (res.success) {
       setSuccessMsg(res.message || 'OTP code sent successfully!');
+      if (res.email) {
+        setEmail(res.email);
+      }
       if (res.devOtp) {
         setDevOtpHint(res.devOtp);
       }
@@ -239,20 +259,39 @@ export const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', initia
 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">
-                Your Registered Email / Google Account *
+                Your Registered Email or Mobile Number *
               </label>
               <input
-                type="email"
+                type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. user@gmail.com or admin@gym.com"
+                placeholder={role === 'Member' ? 'e.g. 9876543210 or user@gmail.com' : 'e.g. admin@gym.com'}
                 className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-xs"
               />
               <p className="text-[11px] text-slate-400 mt-1">
-                A 6-digit secure verification code will be sent to this email address.
+                A 6-digit secure verification code will be sent to your Google inbox.
               </p>
             </div>
+
+            {needsEmail && (
+              <div className="p-3 bg-cyan-50/90 border border-cyan-200 rounded-xl space-y-1.5 animate-fadeIn">
+                <label className="block font-semibold text-cyan-950 text-xs">
+                  Enter Your Google Email Address *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={linkEmail}
+                  onChange={(e) => setLinkEmail(e.target.value)}
+                  placeholder="e.g. yourname@gmail.com"
+                  className="w-full px-3.5 py-2 bg-white border border-cyan-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 text-xs"
+                />
+                <p className="text-[10px] text-cyan-700">
+                  The OTP will be dispatched to this Google email, and your profile will be linked to it.
+                </p>
+              </div>
+            )}
 
             <div className="pt-2 flex space-x-3">
               <button
