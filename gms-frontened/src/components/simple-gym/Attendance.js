@@ -137,7 +137,7 @@ export const Attendance = () => {
   const isToday = selectedDate === new Date().toISOString().split('T')[0];
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto font-sans">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto font-sans">
       {/* Toast Notification */}
       {toast && (
         <div
@@ -321,79 +321,159 @@ export const Attendance = () => {
             No attendance entries logged for this date.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-600">
-              <thead className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] bg-slate-50/70">
-                <tr>
-                  <th className="py-3 px-4 rounded-l-xl">Athlete / Member</th>
-                  <th className="py-3 px-4">Mobile</th>
-                  <th className="py-3 px-4">Plan</th>
-                  <th className="py-3 px-4">Check-In Time</th>
-                  <th className="py-3 px-4">Check-Out Time</th>
-                  <th className="py-3 px-4">Floor Status</th>
-                  <th className="py-3 px-4 text-right rounded-r-xl">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredRecords.map((r) => (
-                  <tr key={r._id} className="hover:bg-cyan-50/40 transition-colors">
-                    <td className="py-3.5 px-4 font-semibold text-slate-900 flex items-center space-x-3">
+          <>
+            {/* Desktop Full Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-600">
+                <thead className="border-b border-slate-200 text-slate-500 font-semibold uppercase text-[11px] bg-slate-50/70">
+                  <tr>
+                    <th className="py-3 px-4 rounded-l-xl">Athlete / Member</th>
+                    <th className="py-3 px-4">Mobile</th>
+                    <th className="py-3 px-4">Plan</th>
+                    <th className="py-3 px-4">Check-In Time</th>
+                    <th className="py-3 px-4">Check-Out Time</th>
+                    <th className="py-3 px-4">Floor Status</th>
+                    <th className="py-3 px-4 text-right rounded-r-xl">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredRecords.map((r) => (
+                    <tr key={r._id} className="hover:bg-cyan-50/40 transition-colors">
+                      <td className="py-3.5 px-4 font-semibold text-slate-900 flex items-center space-x-3">
+                        {r.profilePic ? (
+                          <img
+                            src={r.profilePic}
+                            alt={r.memberName}
+                            className="w-8 h-8 rounded-xl object-cover border border-cyan-200"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-500 flex items-center justify-center text-white font-black text-xs shadow-xs border border-cyan-200">
+                            {r.memberName ? r.memberName[0].toUpperCase() : 'M'}
+                          </div>
+                        )}
+                        <span>{r.memberName}</span>
+                      </td>
+                      <td className="py-3.5 px-4 font-mono">{r.mobileNo}</td>
+                      <td className="py-3.5 px-4 text-cyan-600 font-semibold">{r.membershipPlan || 'General'}</td>
+                      <td className="py-3.5 px-4 font-bold text-slate-800">{r.timeIn}</td>
+                      <td className="py-3.5 px-4 text-slate-500">{r.timeOut || '— In Workout'}</td>
+                      <td className="py-3.5 px-4">
+                        {r.status === 'In Gym' ? (
+                          <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+                            <span>In Gym</span>
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                            Completed
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 text-right space-x-2">
+                        {r.status === 'In Gym' ? (
+                          <button
+                            onClick={() => handleCheckOut(r._id)}
+                            disabled={actionLoading}
+                            className="px-3 py-1 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white rounded-lg text-xs font-bold transition-colors shadow-xs"
+                          >
+                            🚪 Check Out
+                          </button>
+                        ) : (
+                          <span className="text-[11px] text-teal-700 font-bold">Done ✓</span>
+                        )}
+
+                        <button
+                          onClick={() => handleDelete(r._id, r.memberName)}
+                          disabled={actionLoading}
+                          className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-semibold transition-colors"
+                          title="Delete accidental record"
+                        >
+                          ✕
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="md:hidden space-y-3">
+              {filteredRecords.map((r) => (
+                <div
+                  key={r._id}
+                  className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 truncate">
                       {r.profilePic ? (
                         <img
                           src={r.profilePic}
                           alt={r.memberName}
-                          className="w-8 h-8 rounded-xl object-cover border border-cyan-200"
+                          className="w-10 h-10 rounded-xl object-cover border border-cyan-200 shrink-0"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-500 flex items-center justify-center text-white font-black text-xs shadow-xs border border-cyan-200">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-500 flex items-center justify-center text-white font-black text-sm shadow-xs border border-cyan-200 shrink-0">
                           {r.memberName ? r.memberName[0].toUpperCase() : 'M'}
                         </div>
                       )}
-                      <span>{r.memberName}</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-mono">{r.mobileNo}</td>
-                    <td className="py-3.5 px-4 text-cyan-600 font-semibold">{r.membershipPlan || 'General'}</td>
-                    <td className="py-3.5 px-4 font-bold text-slate-800">{r.timeIn}</td>
-                    <td className="py-3.5 px-4 text-slate-500">{r.timeOut || '— In Workout'}</td>
-                    <td className="py-3.5 px-4">
+                      <div className="truncate">
+                        <p className="text-xs font-bold text-slate-900 truncate">{r.memberName}</p>
+                        <p className="text-[10px] text-slate-500">📞 {r.mobileNo}</p>
+                      </div>
+                    </div>
+
+                    <div className="shrink-0 ml-2">
                       {r.status === 'In Gym' ? (
-                        <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
                           <span>In Gym</span>
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
                           Completed
                         </span>
                       )}
-                    </td>
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      {r.status === 'In Gym' ? (
-                        <button
-                          onClick={() => handleCheckOut(r._id)}
-                          disabled={actionLoading}
-                          className="px-3 py-1 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white rounded-lg text-xs font-bold transition-colors shadow-xs"
-                        >
-                          🚪 Check Out
-                        </button>
-                      ) : (
-                        <span className="text-[11px] text-teal-700 font-bold">Done ✓</span>
-                      )}
+                    </div>
+                  </div>
 
+                  <div className="flex items-center justify-between text-[11px] bg-white p-2 rounded-xl border border-slate-100">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Check-In:</span>
+                      <span className="font-bold text-slate-800">{r.timeIn}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Check-Out:</span>
+                      <span className="font-semibold text-slate-700">{r.timeOut || 'Active Now'}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end space-x-2 pt-1 border-t border-slate-200/60">
+                    {r.status === 'In Gym' ? (
                       <button
-                        onClick={() => handleDelete(r._id, r.memberName)}
+                        onClick={() => handleCheckOut(r._id)}
                         disabled={actionLoading}
-                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-semibold transition-colors"
-                        title="Delete accidental record"
+                        className="px-3 py-1 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 text-white rounded-lg text-xs font-bold shadow-2xs"
                       >
-                        ✕
+                        🚪 Check Out
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    ) : (
+                      <span className="text-[11px] text-teal-700 font-bold px-2 py-1">Done ✓</span>
+                    )}
+                    <button
+                      onClick={() => handleDelete(r._id, r.memberName)}
+                      disabled={actionLoading}
+                      className="px-2 py-1 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg text-xs font-semibold"
+                      title="Delete"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+
         )}
       </div>
     </div>

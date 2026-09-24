@@ -88,34 +88,34 @@ export const AddMemberModal = ({ isOpen, onClose, onMemberAdded }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl text-slate-800 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl text-slate-800 max-h-[92vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-black text-xl">
+            <div className="w-10 h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-black text-xl shrink-0">
               +
             </div>
             <div>
-              <h3 className="text-base font-black text-slate-900">Register New Member</h3>
-              <p className="text-xs text-slate-500">Fill in details to onboard member & record fee</p>
+              <h3 className="text-sm sm:text-base font-black text-slate-900">Register New Member</h3>
+              <p className="text-[11px] sm:text-xs text-slate-500">Fill in details to onboard member & record fee</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors shrink-0"
           >
             ✕
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
+          <div className="mt-3 sm:mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
             ⚠️ {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3.5 text-xs">
+        <form onSubmit={handleSubmit} className="mt-3 sm:mt-4 space-y-3 sm:space-y-3.5 text-xs">
           {/* Member Photo / Avatar (Optional & Manual Selection) */}
           <PhotoAvatarSelector
             label="Member Photo (Optional - Upload or Choose Avatar)"
@@ -135,7 +135,7 @@ export const AddMemberModal = ({ isOpen, onClose, onMemberAdded }) => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">Mobile Number *</label>
               <input
@@ -172,7 +172,7 @@ export const AddMemberModal = ({ isOpen, onClose, onMemberAdded }) => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1">Joining Date</label>
               <input

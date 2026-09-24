@@ -75,28 +75,28 @@ export const Login = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E6F8FA] via-[#F4FBFB] to-[#E0F2FE] flex items-center justify-center p-4 font-sans text-slate-800">
-      <div className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-cyan-100 rounded-3xl p-8 shadow-2xl shadow-cyan-900/10 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#E6F8FA] via-[#F4FBFB] to-[#E0F2FE] flex items-center justify-center p-3 sm:p-6 font-sans text-slate-800">
+      <div className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-cyan-100 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl shadow-cyan-900/10 relative overflow-hidden">
         {/* Glow Background */}
         <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Brand Header */}
-        <div className="text-center mb-6">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-teal-500 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-cyan-500/25 mb-3">
+        <div className="text-center mb-5 sm:mb-6">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-teal-500 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-cyan-500/25 mb-2.5 sm:mb-3">
             🏋️
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">GYM MANAGEMENT</h1>
-          <p className="text-xs text-slate-500 mt-1 font-medium">Multi-Role Portal (Admin, Trainer & Member)</p>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">GYM MANAGEMENT</h1>
+          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 font-medium">Multi-Role Portal (Admin, Trainer & Member)</p>
         </div>
 
         {/* 1-Click Quick Demo Pill */}
-        <div className="mb-5 p-2.5 bg-cyan-50/70 border border-cyan-100 rounded-2xl flex items-center justify-between">
-          <span className="text-[11px] text-cyan-800 font-bold pl-1">⚡ Quick Demo:</span>
-          <div className="flex space-x-1.5">
+        <div className="mb-4 sm:mb-5 p-2 sm:p-2.5 bg-cyan-50/70 border border-cyan-100 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+          <span className="text-[11px] text-cyan-800 font-bold pl-0.5">⚡ Quick Demo:</span>
+          <div className="flex space-x-1.5 justify-around sm:justify-start">
             <button
               type="button"
               onClick={() => fillDemo('Admin')}
-              className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+              className={`flex-1 sm:flex-none px-2 sm:px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
                 selectedRole === 'Admin' && !isRegister
                   ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-sm shadow-cyan-500/25'
                   : 'bg-white text-slate-600 border border-slate-200 hover:text-cyan-700 hover:border-cyan-200'
@@ -107,7 +107,7 @@ export const Login = ({ onLoginSuccess }) => {
             <button
               type="button"
               onClick={() => fillDemo('Trainer')}
-              className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+              className={`flex-1 sm:flex-none px-2 sm:px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
                 selectedRole === 'Trainer' && !isRegister
                   ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-sm shadow-cyan-500/25'
                   : 'bg-white text-slate-600 border border-slate-200 hover:text-cyan-700 hover:border-cyan-200'
@@ -118,7 +118,7 @@ export const Login = ({ onLoginSuccess }) => {
             <button
               type="button"
               onClick={() => fillDemo('Member')}
-              className={`px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
+              className={`flex-1 sm:flex-none px-2 sm:px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
                 selectedRole === 'Member' && !isRegister
                   ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-sm shadow-cyan-500/25'
                   : 'bg-white text-slate-600 border border-slate-200 hover:text-cyan-700 hover:border-cyan-200'

@@ -30,6 +30,7 @@ function App() {
   });
 
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'attendance' | 'members' | 'trainers' | 'expired' | 'memberships'
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [viewingMember, setViewingMember] = useState(null);
@@ -76,8 +77,8 @@ function App() {
 
   // 4. Default: Admin Portal (Full Gym Management)
   return (
-    <div className="min-h-screen bg-[#F0F7F9] text-slate-800 flex font-sans">
-      {/* SIDEBAR */}
+    <div className="min-h-screen bg-[#F0F7F9] text-slate-800 flex font-sans relative">
+      {/* SIDEBAR (Desktop sticky + Mobile slide-over drawer) */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -85,6 +86,8 @@ function App() {
         onOpenProfile={() => setIsProfileModalOpen(true)}
         onLogout={handleLogout}
         gymUser={gymUser}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
       {/* MAIN CONTENT AREA */}
@@ -105,10 +108,11 @@ function App() {
               : 'Membership Packages'
           }
           onOpenAddMember={() => setIsAddModalOpen(true)}
+          onToggleMobileNav={() => setIsMobileNavOpen((prev) => !prev)}
         />
 
-        {/* View Switcher */}
-        <main className="flex-1">
+        {/* View Switcher (with bottom padding on mobile for bottom navigation bar) */}
+        <main className="flex-1 pb-24 md:pb-6">
           {activeTab === 'dashboard' && (
             <Dashboard
               key={refreshTrigger}
@@ -146,6 +150,59 @@ function App() {
           {activeTab === 'memberships' && <Memberships key={refreshTrigger} />}
         </main>
       </div>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR (Visible on screens < 768px) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/90 py-1.5 px-3 flex justify-around items-center shadow-lg shadow-slate-900/10">
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${
+            activeTab === 'dashboard' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <span className="text-lg">📊</span>
+          <span className="text-[10px]">Home</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('attendance')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${
+            activeTab === 'attendance' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <span className="text-lg">📅</span>
+          <span className="text-[10px]">Attendance</span>
+        </button>
+
+        {/* Center Floating Quick Add Member Button */}
+        <button
+          onClick={() => setIsAddModalOpen(true)}
+          className="flex flex-col items-center -mt-5"
+          title="Add New Member"
+        >
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-500 to-teal-500 text-white flex items-center justify-center text-xl font-bold shadow-lg shadow-cyan-500/30 active:scale-95 transition-transform">
+            +
+          </div>
+          <span className="text-[9px] font-bold text-cyan-700 mt-0.5">Add</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('members')}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${
+            activeTab === 'members' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <span className="text-lg">👥</span>
+          <span className="text-[10px]">Members</span>
+        </button>
+
+        <button
+          onClick={() => setIsProfileModalOpen(true)}
+          className="flex flex-col items-center py-1 px-2 rounded-xl text-slate-500 hover:text-slate-800 transition-all"
+        >
+          <span className="text-lg">⚙️</span>
+          <span className="text-[10px]">Profile</span>
+        </button>
+      </nav>
 
       {/* MODALS */}
       <AddMemberModal

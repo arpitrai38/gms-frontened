@@ -49,42 +49,44 @@ export const MemberView = ({ memberUser, onLogout }) => {
   return (
     <div className="min-h-screen bg-[#F0F7F9] text-slate-800 font-sans">
       {/* Header */}
-      <header className="h-16 bg-white/95 backdrop-blur border-b border-slate-200/90 px-6 flex items-center justify-between sticky top-0 z-10 shadow-xs">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-500 text-white flex items-center justify-center text-xl font-bold shadow-md shadow-cyan-500/20">
+      <header className="h-16 bg-white/95 backdrop-blur border-b border-slate-200/90 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-10 shadow-xs">
+        <div className="flex items-center space-x-2.5 sm:space-x-3 truncate">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-teal-500 text-white flex items-center justify-center text-xl font-bold shadow-md shadow-cyan-500/20 shrink-0">
             🏋️
           </div>
-          <div>
-            <h1 className="text-sm font-black text-slate-900 tracking-tight flex items-center space-x-2">
+          <div className="truncate">
+            <h1 className="text-xs sm:text-sm font-black text-slate-900 tracking-tight flex items-center space-x-1.5 sm:space-x-2 truncate">
               <span>MEMBER PORTAL</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
-                DIGITAL PASS
+              <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200 shrink-0">
+                PASS
               </span>
             </h1>
-            <p className="text-xs text-slate-500">Welcome, {currentUser?.name || 'Member'}</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 truncate">Welcome, {currentUser?.name || 'Member'}</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
           <button
             onClick={() => setIsProfileModalOpen(true)}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-all flex items-center space-x-1.5"
+            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-all flex items-center space-x-1"
           >
             <span>⚙️</span>
-            <span>Edit Profile & Password</span>
+            <span className="hidden sm:inline">Profile & Password</span>
+            <span className="sm:hidden">Profile</span>
           </button>
 
           <button
             onClick={onLogout}
-            className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center space-x-1"
+            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center space-x-1"
           >
-            <span>🚪 Logout</span>
+            <span>🚪</span>
+            <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="p-6 max-w-4xl mx-auto space-y-6">
+      <main className="p-3 sm:p-6 max-w-4xl mx-auto space-y-4 sm:space-y-6">
         {/* First Login Notification Banner */}
         {isFirstLogin && (
           <div className="p-4 rounded-2xl bg-gradient-to-r from-cyan-500/15 via-teal-500/10 to-cyan-500/5 border border-cyan-300 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
