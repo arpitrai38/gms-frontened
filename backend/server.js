@@ -1348,17 +1348,41 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', project: 'CodingHunger MERN Gym Multi-Role' });
 });
 
+// Catch-all for any undefined API routes - ALWAYS return JSON, never HTML
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `API route not found: ${req.method} ${req.originalUrl}`
+  });
+});
+
 // Serve frontend React build in production (e.g. Render unified service)
 const frontendBuildPath = path.join(__dirname, '../gms-frontened/build');
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
   app.get('*', (req, res) => {
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ success: false, message: 'API route not found' });
-    }
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
+} else {
+  // If running standalone backend, return JSON status on root
+  app.get('/', (req, res) => {
+    res.json({
+      success: true,
+      status: 'online',
+      message: 'Multi-Role Gym Backend API is running successfully',
+      health: '/api/health'
+    });
+  });
 }
+
+// Global JSON error handler middleware (prevents Express HTML stack trace responses)
+app.use((err, req, res, next) => {
+  console.error('❌ Unhandled Server Error:', err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal Server Error'
+  });
+});
 
 
 const server = app.listen(PORT, () => {

@@ -1,17 +1,40 @@
-const getApiBase = () => {
+export const getApiBase = () => {
+  // 1. Explicit React build environment variable
   if (process.env.REACT_APP_API_URL) {
     return process.env.REACT_APP_API_URL.replace(/\/+$/, '');
   }
+
   if (typeof window !== 'undefined') {
+    // 2. Allow runtime query parameter or localStorage override (?api=https://... or localStorage.getItem('gym_api_url'))
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryApi = urlParams.get('api');
+      if (queryApi) {
+        localStorage.setItem('gym_api_url', queryApi);
+      }
+    } catch (e) {
+      // Ignore URLSearchParams error in rare environments
+    }
+
+    const customApi =
+      window.__API_URL__ ||
+      localStorage.getItem('gym_api_url') ||
+      localStorage.getItem('REACT_APP_API_URL');
+    if (customApi) {
+      return customApi.replace(/\/+$/, '');
+    }
+
+    // 3. React dev server on localhost:3000 -> target backend on 5000
     if (window.location.hostname === 'localhost' && window.location.port === '3000') {
       return 'http://localhost:5000/api';
     }
+
+    // 4. Default relative /api (unified full-stack deployment)
     return '/api';
   }
+
   return 'http://localhost:5000/api';
 };
-
-const API_BASE = getApiBase();
 
 export const getActiveGymId = () => {
   try {
@@ -26,20 +49,72 @@ export const getActiveGymId = () => {
 
 async function request(endpoint, options = {}) {
   try {
+    const apiBase = getApiBase();
     const gymId = getActiveGymId();
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${apiBase}${cleanEndpoint}`;
+
+    const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
+        Accept: 'application/json',
         ...(gymId ? { 'x-gym-id': gymId } : {}),
         ...(options.headers || {})
       },
       ...options
     });
-    const data = await res.json();
-    return data;
+
+    const contentType = res.headers.get('content-type') || '';
+    const rawText = await res.text();
+
+    // Handle valid JSON response
+    if (contentType.includes('application/json')) {
+      try {
+        const data = JSON.parse(rawText);
+        return data;
+      } catch (err) {
+        console.warn(`[API Warning] Malformed JSON received from ${url}:`, err);
+        return {
+          success: false,
+          message: 'Server returned an invalid JSON response.'
+        };
+      }
+    }
+
+    // Handle HTML or unexpected response formats (e.g. Render 502/503 cold starts or static 404s)
+    console.warn(`[API Warning] Expected JSON but received ${contentType} (Status ${res.status}) from ${url}:`, rawText.slice(0, 150));
+
+    if (res.status === 502 || res.status === 503) {
+      return {
+        success: false,
+        message: 'Render server is waking up from standby (free tier cold start). Please wait 15-20 seconds and try again.'
+      };
+    }
+
+    if (res.status === 404) {
+      return {
+        success: false,
+        message: `Backend API endpoint not found (${cleanEndpoint}). Please verify backend server URL.`
+      };
+    }
+
+    if (rawText.includes('<!DOCTYPE') || rawText.includes('<html')) {
+      return {
+        success: false,
+        message: 'Cannot connect to backend API server. The backend might be starting up or the API URL is pointing to a static web page.'
+      };
+    }
+
+    return {
+      success: false,
+      message: rawText || `Server request failed with status ${res.status}`
+    };
   } catch (error) {
     console.warn(`[API Warning] Request to ${endpoint} failed:`, error.message);
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error.message || 'Network connection error. Please check your internet and server status.'
+    };
   }
 }
 
