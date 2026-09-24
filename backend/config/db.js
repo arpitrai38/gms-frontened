@@ -2,7 +2,14 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gym_management';
+    let rawUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gym_management';
+    let uri = rawUri.trim().replace(/^["']|["']$/g, '');
+
+    // Strip accidental prefix if user pasted "MONGO_URI = mongodb+srv://..."
+    if (uri.includes('=') && uri.split('=')[0].toUpperCase().includes('MONGO')) {
+      uri = uri.substring(uri.indexOf('=') + 1).trim().replace(/^["']|["']$/g, '');
+    }
+
     const conn = await mongoose.connect(uri, {
       dbName: 'gym_management',
       serverSelectionTimeoutMS: 10000
