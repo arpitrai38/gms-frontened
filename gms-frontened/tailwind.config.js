@@ -1,0 +1,86 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        aqua: {
+          50: '#F0FDFA',
+          100: '#CCFBF1',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0D9488',
+          700: '#0F766E',
+          800: '#115E59',
+          900: '#134E4A',
+          DEFAULT: '#06B6D4',
+          light: '#E0F7FA',
+          dark: '#0891B2',
+        },
+        fitflow: {
+          bg: '#F4F9FA',
+          surface: '#FFFFFF',
+          card: '#FFFFFF',
+          cardHover: '#F0FDFD',
+          border: '#E0F2FE',
+          borderLight: '#F0F9FF',
+          primary: '#06B6D4',
+          primaryHover: '#0891B2',
+          secondary: '#14B8A6',
+          accent: '#0EA5E9',
+          textDark: '#0F172A',
+          textMuted: '#64748B',
+          textLight: '#94A3B8',
+          mint: '#E6FFFA',
+          mintText: '#0D9488',
+          coral: '#FEECEB',
+          coralText: '#EF4444',
+          lilac: '#E0F2FE',
+          lilacText: '#0284C7',
+          amber: '#FFFBEB',
+          amberText: '#D97706',
+        },
+        gym: {
+          bg: '#F4F9FA',
+          surface: '#FFFFFF',
+          card: '#FFFFFF',
+          cardHover: '#F0FDFD',
+          border: '#E2E8F0',
+          borderLight: '#F1F5F9',
+        },
+        neon: {
+          lime: '#10B981',
+          limeHover: '#059669',
+          cyan: '#06B6D4',
+          cyanHover: '#0891B2',
+          coral: '#EF4444',
+          purple: '#8B5CF6',
+          emerald: '#10B981',
+          amber: '#F59E0B',
+        }
+      },
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        display: ['Outfit', 'sans-serif'],
+      },
+      boxShadow: {
+        'soft': '0 10px 30px -4px rgba(6, 182, 212, 0.08), 0 4px 12px rgba(0, 0, 0, 0.02)',
+        'soft-lg': '0 20px 40px -8px rgba(6, 182, 212, 0.14), 0 8px 16px rgba(0, 0, 0, 0.03)',
+        'glow-primary': '0 8px 25px -4px rgba(6, 182, 212, 0.35)',
+        'glow-aqua': '0 8px 25px -4px rgba(6, 182, 212, 0.4)',
+        'glow-cyan': '0 8px 25px -4px rgba(6, 182, 212, 0.35)',
+        'glow-coral': '0 8px 25px -4px rgba(239, 68, 68, 0.35)',
+        'card': '0 10px 30px -4px rgba(6, 182, 212, 0.06)',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      }
+    },
+  },
+  plugins: [],
+}

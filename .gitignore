@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files with sensitive credentials
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.local
+gms-frontened/.env.local
+gms-frontened/.env.development.local
+gms-frontened/.env.test.local
+gms-frontened/.env.production.local
+
+# Build output
+gms-frontened/build/
+build/
+dist/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
