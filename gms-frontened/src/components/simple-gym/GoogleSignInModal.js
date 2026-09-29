@@ -47,11 +47,6 @@ export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onL
     }
   };
 
-  const handleQuickAccount = (email, name) => {
-    setGoogleEmail(email);
-    setFullName(name);
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn font-sans">
       <div className="relative w-full max-w-sm bg-white border border-cyan-100 rounded-3xl p-6 shadow-2xl text-slate-800">
@@ -96,24 +91,7 @@ export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onL
           </div>
         )}
 
-        {/* Real Quick Account Suggestion */}
-        <div className="mt-3.5 mb-2">
-          <button
-            type="button"
-            onClick={() => handleQuickAccount('sadhanamarendra12@gmail.com', 'Arpit Rai')}
-            className="w-full flex items-center space-x-2.5 p-2 rounded-xl bg-cyan-50/60 hover:bg-cyan-100/60 border border-cyan-100 transition-all text-left cursor-pointer group"
-          >
-            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-600 to-teal-600 text-white flex items-center justify-center font-black text-[10px] shrink-0">
-              AR
-            </div>
-            <div className="flex-1 truncate">
-              <p className="text-[11px] font-bold text-slate-800 group-hover:text-cyan-800 truncate">
-                Arpit Rai (sadhanamarendra12@gmail.com)
-              </p>
-              <p className="text-[9px] text-cyan-700">Click to autofill your account</p>
-            </div>
-          </button>
-        </div>
+
 
         <form onSubmit={handleGoogleLogin} className="space-y-3 text-xs mt-3">
           <div>
