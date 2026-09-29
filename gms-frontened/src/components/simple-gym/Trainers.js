@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { trainersAPI } from '../../services/api';
 import { AddTrainerModal } from './AddTrainerModal';
+import { EditTrainerModal } from './EditTrainerModal';
 
 export const Trainers = () => {
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingTrainer, setEditingTrainer] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
 
   const fetchTrainers = useCallback(async () => {
@@ -141,14 +143,26 @@ export const Trainers = () => {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => handleDelete(trainer._id, trainer.userName)}
-                      disabled={deletingId === trainer._id}
-                      className="w-8 h-8 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors text-xs"
-                      title="Remove Trainer"
-                    >
-                      🗑️
-                    </button>
+                    {/* Card Actions: Edit & Delete */}
+                    <div className="flex items-center space-x-1.5 shrink-0">
+                      <button
+                        onClick={() => setEditingTrainer(trainer)}
+                        className="px-2.5 py-1.5 rounded-xl bg-cyan-50 hover:bg-cyan-100/90 text-cyan-700 hover:text-cyan-800 border border-cyan-200/80 font-bold text-xs flex items-center space-x-1 transition-all shadow-xs active:scale-95 cursor-pointer"
+                        title="Edit Trainer Profile & Password"
+                      >
+                        <span className="text-xs">✏️</span>
+                        <span className="text-[11px] font-semibold">Edit</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(trainer._id, trainer.userName)}
+                        disabled={deletingId === trainer._id}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 flex items-center justify-center transition-colors text-xs active:scale-95 cursor-pointer"
+                        title="Remove Trainer"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
 
                   {/* Details */}
@@ -166,10 +180,21 @@ export const Trainers = () => {
 
                 {/* Password / Access Pill */}
                 <div className="p-2.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">Initial Password:</span>
-                  <span className="font-bold text-cyan-800 font-mono bg-white px-2 py-0.5 rounded-lg border border-slate-200">
-                    {trainer.userName}
-                  </span>
+                  <div className="flex items-center space-x-1.5 min-w-0">
+                    <span className="text-slate-400 shrink-0">Password:</span>
+                    <span className="font-bold text-cyan-800 font-mono bg-white px-2 py-0.5 rounded-lg border border-slate-200 truncate">
+                      {trainer.isFirstLogin === false ? '••••••••' : trainer.userName}
+                    </span>
+                    {trainer.isFirstLogin === false && (
+                      <span className="text-[10px] text-teal-600 font-semibold shrink-0">(Set)</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setEditingTrainer(trainer)}
+                    className="text-[11px] font-bold text-cyan-600 hover:text-cyan-700 hover:underline shrink-0 ml-2 cursor-pointer"
+                  >
+                    Change
+                  </button>
                 </div>
               </div>
             );
@@ -183,6 +208,18 @@ export const Trainers = () => {
         onClose={() => setIsAddModalOpen(false)}
         onTrainerAdded={(newTrainer) => {
           setTrainers((prev) => [newTrainer, ...prev]);
+        }}
+      />
+
+      {/* Edit Trainer Profile Modal */}
+      <EditTrainerModal
+        isOpen={Boolean(editingTrainer)}
+        trainer={editingTrainer}
+        onClose={() => setEditingTrainer(null)}
+        onTrainerUpdated={(updatedTrainer) => {
+          setTrainers((prev) =>
+            prev.map((t) => (t._id === updatedTrainer._id ? updatedTrainer : t))
+          );
         }}
       />
     </div>

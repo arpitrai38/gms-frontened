@@ -277,6 +277,33 @@ export const GymProvider = ({ children }) => {
     }
   };
 
+  const updateTrainer = async (id, trainerData) => {
+    try {
+      const res = await trainersAPI.updateProfile(id, trainerData);
+      if (res.success && res.data) {
+        setTrainers(prev => prev.map(t => (t._id === id || t.id === id ? res.data : t)));
+        return res;
+      }
+      return res;
+    } catch (e) {
+      console.error(e);
+      return { success: false, message: e.message };
+    }
+  };
+
+  const deleteTrainer = async (id) => {
+    try {
+      const res = await trainersAPI.delete(id);
+      if (res.success) {
+        setTrainers(prev => prev.filter(t => t._id !== id && t.id !== id));
+      }
+      return res;
+    } catch (e) {
+      console.error(e);
+      return { success: false, message: e.message };
+    }
+  };
+
   // Payments & Billing
   const recordPayment = async (paymentData) => {
     try {
@@ -400,6 +427,8 @@ export const GymProvider = ({ children }) => {
 
       trainers,
       addTrainer,
+      updateTrainer,
+      deleteTrainer,
 
       plans,
 

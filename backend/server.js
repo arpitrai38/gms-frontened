@@ -872,12 +872,32 @@ app.delete('/api/trainers/:id', async (req, res) => {
 
 app.put('/api/trainers/:id/profile', async (req, res) => {
   try {
-    const { userName, phone, specialty, profilePic } = req.body;
+    const { userName, email, phone, specialty, profilePic, password } = req.body;
     const updateData = {};
     if (userName !== undefined) updateData.userName = userName.trim();
-    if (phone !== undefined) updateData.phone = phone.trim();
     if (specialty !== undefined) updateData.specialty = specialty.trim();
     if (profilePic !== undefined) updateData.profilePic = profilePic;
+
+    if (phone !== undefined) {
+      updateData.phone = phone ? phone.replace(/\D/g, '').slice(0, 10) : '';
+    }
+
+    if (email !== undefined && email.trim()) {
+      const cleanEmail = email.toLowerCase().trim();
+      const existing = await GymUser.findOne({ email: cleanEmail, _id: { $ne: req.params.id } });
+      if (existing) {
+        return res.status(400).json({ success: false, message: 'An account with this email address already exists' });
+      }
+      updateData.email = cleanEmail;
+    }
+
+    if (password !== undefined && password.trim()) {
+      if (password.trim().length < 3) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 3 characters' });
+      }
+      updateData.password = password.trim();
+      updateData.isFirstLogin = false;
+    }
 
     const updated = await GymUser.findOneAndUpdate(
       { _id: req.params.id, role: 'Trainer' },
