@@ -155,7 +155,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FCFD] text-slate-900 font-sans selection:bg-cyan-500 selection:text-white relative">
+    <div className="min-h-screen bg-[#F8FCFD] text-slate-900 font-sans selection:bg-cyan-500 selection:text-white relative overflow-x-hidden w-full">
       {/* Background ambient gradient glow in soft White & Aqua */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-40 left-1/4 w-[700px] h-[700px] bg-cyan-200/35 rounded-full blur-[160px]"></div>
@@ -167,22 +167,22 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* 1. TOP NAVIGATION BAR */}
       {/* ============================================================ */}
       <nav className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-cyan-100/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           {/* Brand */}
-          <a href="#" className="flex items-center space-x-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-cyan-600/25 group-hover:scale-105 transition-transform">
+          <a href="#" className="flex items-center space-x-2 sm:space-x-3 group min-w-0 mr-2">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-cyan-500 flex items-center justify-center text-white text-lg sm:text-xl font-black shadow-lg shadow-cyan-600/25 group-hover:scale-105 transition-transform shrink-0">
               ⚡
             </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="text-xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-cyan-900 to-teal-800 bg-clip-text text-transparent">
-                  IRONPULSE
+            <div className="min-w-0">
+              <div className="flex items-center space-x-1 sm:space-x-1.5">
+                <span className="text-base sm:text-xl font-black tracking-tight bg-gradient-to-r from-slate-900 via-cyan-900 to-teal-800 bg-clip-text text-transparent truncate">
+                  AmarSadhana
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 border border-cyan-200">
+                <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-cyan-100 text-cyan-800 border border-cyan-200 shrink-0">
                   GMS
                 </span>
               </div>
-              <p className="text-[10px] font-semibold text-slate-500 tracking-wide uppercase">
+              <p className="text-[9px] sm:text-[10px] font-semibold text-slate-500 tracking-wide uppercase truncate hidden sm:block">
                 Facility & Member Cloud ERP
               </p>
             </div>
@@ -199,10 +199,10 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
           </div>
 
           {/* Right Action Group */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
             {gymUser ? (
-              <div className="flex items-center space-x-3">
-                <div className="hidden sm:flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-cyan-100">
+              <div className="flex items-center space-x-1.5 sm:space-x-3">
+                <div className="hidden md:flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-cyan-100">
                   <span className="text-sm">👤</span>
                   <span className="text-xs font-bold text-slate-800 truncate max-w-[120px]">
                     {gymUser.userName || gymUser.name || 'Admin'}
@@ -210,13 +210,13 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                 </div>
                 <button
                   onClick={() => onLaunchGymApp(gymUser, gymUser.role || 'Admin')}
-                  className="py-2 px-4 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white shadow-md shadow-cyan-600/20 transition-all cursor-pointer active:scale-95"
+                  className="py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl font-bold text-[11px] sm:text-xs bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white shadow-md shadow-cyan-600/20 transition-all cursor-pointer active:scale-95"
                 >
-                  Go to Dashboard →
+                  <span className="hidden sm:inline">Go to </span>Dashboard →
                 </button>
                 <button
                   onClick={onLogout}
-                  className="py-2 px-3 rounded-xl border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer"
+                  className="py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 font-bold text-xs flex items-center space-x-1 transition-all cursor-pointer"
                   title="Sign out of your session"
                 >
                   <span>🚪</span>
@@ -224,18 +224,18 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                 </button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="flex items-center space-x-1.5 sm:space-x-2.5">
                 <button
                   onClick={() => handleOpenAuthModal('Admin', false)}
-                  className="py-2 px-3.5 sm:px-4 rounded-xl border border-slate-200 hover:border-cyan-500 text-slate-700 hover:text-cyan-700 bg-white hover:bg-cyan-50/50 text-xs font-bold transition-all cursor-pointer shadow-xs"
+                  className="py-1.5 px-2.5 sm:py-2 sm:px-4 rounded-xl border border-slate-200 hover:border-cyan-500 text-slate-700 hover:text-cyan-700 bg-white hover:bg-cyan-50/50 text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-xs whitespace-nowrap"
                 >
                   Sign In
                 </button>
                 <button
                   onClick={() => handleOpenAuthModal('Admin', true)}
-                  className="py-2 px-3.5 sm:px-5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-500 hover:from-cyan-500 hover:to-teal-500 text-white text-xs font-extrabold shadow-lg shadow-cyan-600/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  className="py-1.5 px-2.5 sm:py-2 sm:px-5 rounded-xl bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-500 hover:from-cyan-500 hover:to-teal-500 text-white text-[11px] sm:text-xs font-extrabold shadow-md sm:shadow-lg shadow-cyan-600/25 transition-all hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
                 >
-                  Register Gym
+                  <span>Register</span><span className="hidden sm:inline"> Gym</span>
                 </button>
               </div>
             )}
@@ -243,7 +243,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             {/* Mobile Hamburger */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl bg-slate-50 text-slate-700 hover:text-cyan-600 border border-slate-200"
+              className="lg:hidden p-1.5 sm:p-2 rounded-xl bg-slate-50 text-slate-700 hover:text-cyan-600 border border-slate-200 shrink-0"
               aria-label="Toggle navigation"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden bg-white border-b border-cyan-100 px-4 pt-3 pb-6 space-y-3 shadow-xl">
+          <div className="lg:hidden bg-white border-b border-cyan-100 px-4 pt-3 pb-6 space-y-3 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto">
             <a
               href="#features"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -319,33 +319,33 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 2. HERO SECTION (WHITE & AQUA THEME) */}
       {/* ============================================================ */}
-      <section className="relative z-10 pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden">
+      <section className="relative z-10 pt-8 pb-14 sm:pt-14 sm:pb-20 lg:pt-20 lg:pb-28 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+
             {/* Left Column: Value Proposition */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-xs font-bold tracking-wide">
-                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
-                <span>ENTERPRISE-GRADE GYM MANAGEMENT INFRASTRUCTURE</span>
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-cyan-50 border border-cyan-200 text-cyan-800 text-[10px] sm:text-xs font-bold tracking-wide max-w-full">
+                <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shrink-0"></span>
+                <span className="truncate">ENTERPRISE-GRADE GYM MANAGEMENT INFRASTRUCTURE</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.12]">
-                Run Your Entire Gym <br />
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.14] break-words">
+                Run Your Entire Gym <br className="hidden sm:inline" />
                 <span className="bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-500 bg-clip-text text-transparent">
                   With Absolute Precision.
                 </span>
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
                 The modern, all-in-one operations platform for gym owners, fitness trainers, and members. Contactless QR turnstile check-ins, automated subscription renewals with collection guard, trainer workout builders, and real-time financial telemetry.
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2 w-full">
                 <button
                   onClick={() => handleOpenAuthModal('Admin', true)}
-                  className="w-full sm:w-auto py-3.5 px-7 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-500 hover:from-cyan-500 hover:to-teal-500 text-white font-black text-sm shadow-xl shadow-cyan-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center space-x-2"
+                  className="w-full sm:w-auto py-3 sm:py-3.5 px-6 sm:px-7 rounded-2xl bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-500 hover:from-cyan-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm shadow-xl shadow-cyan-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center space-x-2"
                 >
                   <span>⚡ Register Your Gym</span>
                   <span>→</span>
@@ -353,93 +353,93 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
 
                 <button
                   onClick={() => handleOpenAuthModal('Admin', false)}
-                  className="w-full sm:w-auto py-3.5 px-6 rounded-2xl bg-white hover:bg-cyan-50/50 border border-cyan-200 text-slate-800 hover:text-cyan-800 font-bold text-sm shadow-sm transition-all cursor-pointer flex items-center justify-center space-x-2"
+                  className="w-full sm:w-auto py-3 sm:py-3.5 px-5 sm:px-6 rounded-2xl bg-white hover:bg-cyan-50/50 border border-cyan-200 text-slate-800 hover:text-cyan-800 font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer flex items-center justify-center space-x-2"
                 >
                   <span>🔑 Sign In to Workspace</span>
                 </button>
 
                 <a
                   href="#features"
-                  className="w-full sm:w-auto py-3.5 px-5 rounded-2xl border border-slate-200 hover:border-cyan-300 text-slate-600 hover:text-cyan-700 font-semibold text-sm transition-all flex items-center justify-center bg-white"
+                  className="w-full sm:w-auto py-3 sm:py-3.5 px-5 rounded-2xl border border-slate-200 hover:border-cyan-300 text-slate-600 hover:text-cyan-700 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center bg-white"
                 >
                   Explore Features ↓
                 </a>
               </div>
 
               {/* Trust Indicators */}
-              <div className="pt-6 border-t border-cyan-100 flex flex-wrap items-center justify-center lg:justify-start gap-6 text-xs text-slate-600 font-semibold">
-                <div className="flex items-center space-x-2">
-                  <span className="text-cyan-600 text-base">✓</span>
-                  <span>10-Digit Mobile Auth</span>
+              <div className="pt-6 border-t border-cyan-100 grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-6 text-xs text-slate-600 font-semibold">
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <span className="text-cyan-600 text-sm sm:text-base shrink-0">✓</span>
+                  <span className="truncate">10-Digit Mobile Auth</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-cyan-600 text-base">✓</span>
-                  <span>Contactless Turnstile QR</span>
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <span className="text-cyan-600 text-sm sm:text-base shrink-0">✓</span>
+                  <span className="truncate">Contactless Turnstile QR</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-cyan-600 text-base">✓</span>
-                  <span>Collection Inflation Guard</span>
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <span className="text-cyan-600 text-sm sm:text-base shrink-0">✓</span>
+                  <span className="truncate">Collection Inflation Guard</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-cyan-600 text-base">✓</span>
-                  <span>Secure Cloud MongoDB</span>
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <span className="text-cyan-600 text-sm sm:text-base shrink-0">✓</span>
+                  <span className="truncate">Secure Cloud MongoDB</span>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Live Interactive Command Center Preview Card */}
-            <div className="lg:col-span-5 relative">
+            <div className="lg:col-span-5 relative w-full">
               <div className="relative mx-auto max-w-md lg:max-w-none">
                 {/* Glow ring */}
                 <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-cyan-400 to-teal-400 opacity-20 blur-xl"></div>
 
                 {/* Main Card in White & Aqua */}
-                <div className="relative bg-white border border-cyan-100 rounded-3xl p-5 sm:p-6 shadow-2xl shadow-cyan-950/5 backdrop-blur-xl">
+                <div className="relative bg-white border border-cyan-100 rounded-3xl p-4 sm:p-6 shadow-2xl shadow-cyan-950/5 backdrop-blur-xl">
                   {/* Card Header */}
-                  <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                  <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-100">
                     <div className="flex items-center space-x-2.5">
-                      <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
-                      <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                      <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500 animate-ping"></div>
+                      <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-800">
                         Live Floor Telemetry
                       </span>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200">
+                    <span className="text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-800 border border-cyan-200">
                       ⚡ Turnstile Engine
                     </span>
                   </div>
 
                   {/* Floor Metrics Grid */}
-                  <div className="grid grid-cols-3 gap-3 my-5">
-                    <div className="p-3 rounded-2xl bg-cyan-50/70 border border-cyan-100 text-center">
-                      <span className="text-[10px] font-bold text-cyan-800 block uppercase">Floor Count</span>
-                      <span className="text-2xl font-black text-slate-900 font-mono">18</span>
-                      <span className="text-[9px] text-emerald-700 block font-semibold">Active now</span>
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 my-4 sm:my-5">
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-cyan-50/70 border border-cyan-100 text-center">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-cyan-800 block uppercase truncate">Floor Count</span>
+                      <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono">18</span>
+                      <span className="text-[8px] sm:text-[9px] text-emerald-700 block font-semibold truncate">Active now</span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-teal-50/70 border border-teal-100 text-center">
-                      <span className="text-[10px] font-bold text-teal-800 block uppercase">Today's Visits</span>
-                      <span className="text-2xl font-black text-slate-900 font-mono">42</span>
-                      <span className="text-[9px] text-cyan-700 block font-semibold">+14% vs avg</span>
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-teal-50/70 border border-teal-100 text-center">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-teal-800 block uppercase truncate">Today's Visits</span>
+                      <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono">42</span>
+                      <span className="text-[8px] sm:text-[9px] text-cyan-700 block font-semibold truncate">+14% vs avg</span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-sky-50/70 border border-sky-100 text-center">
-                      <span className="text-[10px] font-bold text-sky-800 block uppercase">Collection</span>
-                      <span className="text-2xl font-black text-slate-900 font-mono">100%</span>
-                      <span className="text-[9px] text-emerald-700 block font-semibold">Protected</span>
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-sky-50/70 border border-sky-100 text-center">
+                      <span className="text-[9px] sm:text-[10px] font-bold text-sky-800 block uppercase truncate">Collection</span>
+                      <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono">100%</span>
+                      <span className="text-[8px] sm:text-[9px] text-emerald-700 block font-semibold truncate">Protected</span>
                     </div>
                   </div>
 
                   {/* Dynamic Turnstile Pass Simulation */}
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-cyan-100/60 mb-5">
-                    <div className="flex items-center justify-between mb-3">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-cyan-100/60 mb-4 sm:mb-5">
+                    <div className="flex items-center justify-between mb-2.5 sm:mb-3">
                       <div className="flex items-center space-x-2">
-                        <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-600 to-teal-600 flex items-center justify-center text-white text-xs font-black">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-600 to-teal-600 flex items-center justify-center text-white text-xs font-black shrink-0">
                           QR
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-slate-900">Contactless QR Turnstile</p>
+                          <p className="text-xs font-bold text-slate-900 leading-tight">Contactless QR Turnstile</p>
                           <p className="text-[10px] text-cyan-700">Dynamic Scan Engine</p>
                         </div>
                       </div>
-                      <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 shrink-0">
                         ● Live Sync
                       </span>
                     </div>
@@ -450,16 +450,16 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                   </div>
 
                   {/* Fast Action Buttons */}
-                  <div className="grid grid-cols-2 gap-2.5">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
                     <button
                       onClick={() => handleOpenAuthModal('Admin', false)}
-                      className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 text-center cursor-pointer"
+                      className="py-2.5 px-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-cyan-600/20 text-center cursor-pointer"
                     >
                       Admin Sign In →
                     </button>
                     <button
                       onClick={() => handleOpenAuthModal('Member', false)}
-                      className="py-2.5 px-3 rounded-xl bg-white hover:bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold text-xs text-center cursor-pointer shadow-2xs"
+                      className="py-2.5 px-2.5 sm:px-3 rounded-xl bg-white hover:bg-cyan-50 text-cyan-800 border border-cyan-200 font-bold text-xs text-center cursor-pointer shadow-xs"
                     >
                       Member Pass →
                     </button>
@@ -475,57 +475,58 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 3. LIVE STATS / METRICS BANNER */}
       {/* ============================================================ */}
-      <section className="relative z-10 py-10 bg-white border-y border-cyan-100 shadow-xs">
+      <section className="relative z-10 py-8 sm:py-10 bg-white border-y border-cyan-100 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="p-4 rounded-2xl bg-cyan-50/40 border border-cyan-100/60">
-              <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-mono">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 text-center">
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-cyan-50/40 border border-cyan-100/60">
+              <span className="text-2xl sm:text-4xl font-black bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-mono">
                 99.9%
               </span>
-              <p className="text-xs text-slate-600 font-semibold mt-1">Platform Uptime & Cloud SLA</p>
+              <p className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Platform Uptime & Cloud SLA</p>
             </div>
-            <div className="p-4 rounded-2xl bg-teal-50/40 border border-teal-100/60">
-              <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-mono">
+            <div className="p-4 rounded-xl sm:rounded-2xl bg-teal-50/40 border border-teal-100/60">
+              <span className="text-2xl sm:text-4xl font-black bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-mono">
                 &lt; 1.2s
               </span>
-              <p className="text-xs text-slate-600 font-semibold mt-1">QR Pass Turnstile Scan Speed</p>
+              <p className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">QR Pass Turnstile Scan Speed</p>
             </div>
-            <div className="p-4 rounded-2xl bg-sky-50/40 border border-sky-100/60">
-              <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-mono">
+            <div className="p-4 rounded-xl sm:rounded-2xl bg-sky-50/40 border border-sky-100/60">
+              <span className="text-2xl sm:text-4xl font-black bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-mono">
                 100%
               </span>
-              <p className="text-xs text-slate-600 font-semibold mt-1">Collection Integrity Protected</p>
+              <p className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Collection Integrity Protected</p>
             </div>
-            <div className="p-4 rounded-2xl bg-emerald-50/40 border border-emerald-100/60">
-              <span className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-mono">
+            <div className="p-4 rounded-xl sm:rounded-2xl bg-emerald-50/40 border border-emerald-100/60">
+              <span className="text-2xl sm:text-4xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-mono">
                 10-Digit
               </span>
-              <p className="text-xs text-slate-600 font-semibold mt-1">Strict Mobile Verification</p>
+              <p className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-1">Strict Mobile Verification</p>
             </div>
           </div>
         </div>
       </section>
 
+
       {/* ============================================================ */}
       {/* 4. CORE FEATURES SECTION (WHITE & AQUA) */}
       {/* ============================================================ */}
-      <section id="features" className="relative z-10 py-20 bg-[#F8FCFD]">
+      <section id="features" className="relative z-10 py-14 sm:py-20 bg-[#F8FCFD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-200">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-200">
               Platform Architecture
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
               Built For Complete Gym Operations
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 font-normal">
+            <p className="text-xs sm:text-base text-slate-600 mt-2 font-normal">
               Every feature engineered for high reliability, clean data integrity, and effortless daily floor management.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Feature 1 */}
-            <div className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-sm">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-xs sm:shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">
                 📱
               </div>
@@ -536,7 +537,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Feature 2 */}
-            <div className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-sm">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-xs sm:shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">
                 🛡️
               </div>
@@ -547,7 +548,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Feature 3 */}
-            <div className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-sm">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-xs sm:shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">
                 ⚡
               </div>
@@ -558,7 +559,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Feature 4 */}
-            <div className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-sm">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-xs sm:shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">
                 🏋️
               </div>
@@ -569,7 +570,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Feature 5 */}
-            <div className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-sm">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-xs sm:shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">
                 🧾
               </div>
@@ -580,7 +581,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Feature 6 */}
-            <div className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-sm">
+            <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-xl hover:-translate-y-1 transition-all group shadow-xs sm:shadow-sm">
               <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-black mb-4 group-hover:scale-110 transition-transform">
                 📊
               </div>
@@ -596,23 +597,23 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 5. ROLE-BASED WORKSPACES SHOWCASE (WHITE & AQUA) */}
       {/* ============================================================ */}
-      <section id="portals" className="relative z-10 py-20 bg-white border-y border-cyan-100">
+      <section id="portals" className="relative z-10 py-14 sm:py-20 bg-white border-y border-cyan-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-wider text-teal-800 bg-teal-100 px-3 py-1 rounded-full border border-teal-200">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-teal-800 bg-teal-100 px-3 py-1 rounded-full border border-teal-200">
               Role-Based Portals
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
               Dedicated Workspaces For Every Stakeholder
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 font-normal">
+            <p className="text-xs sm:text-base text-slate-600 mt-2 font-normal">
               Granular role isolation ensures gym administrators, personal coaches, and members each have their tailored interfaces.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Workspace 1: Admin */}
-            <div className="p-7 rounded-3xl bg-cyan-50/40 border border-cyan-200 flex flex-col justify-between hover:border-cyan-400 hover:shadow-xl transition-all shadow-sm">
+            <div className="p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-cyan-50/40 border border-cyan-200 flex flex-col justify-between hover:border-cyan-400 hover:shadow-xl transition-all shadow-xs sm:shadow-sm">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-cyan-100 text-cyan-800 border border-cyan-200">
                   Facility Leadership
@@ -645,7 +646,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Workspace 2: Trainer */}
-            <div className="p-7 rounded-3xl bg-teal-50/40 border border-teal-200 flex flex-col justify-between hover:border-teal-400 hover:shadow-xl transition-all shadow-sm">
+            <div className="p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-teal-50/40 border border-teal-200 flex flex-col justify-between hover:border-teal-400 hover:shadow-xl transition-all shadow-xs sm:shadow-sm">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-teal-100 text-teal-800 border border-teal-200">
                   Coaching Staff
@@ -678,7 +679,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
 
             {/* Workspace 3: Member */}
-            <div className="p-7 rounded-3xl bg-sky-50/40 border border-sky-200 flex flex-col justify-between hover:border-sky-400 hover:shadow-xl transition-all shadow-sm">
+            <div className="p-6 sm:p-7 rounded-2xl sm:rounded-3xl bg-sky-50/40 border border-sky-200 flex flex-col justify-between hover:border-sky-400 hover:shadow-xl transition-all shadow-xs sm:shadow-sm">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-sky-100 text-sky-800 border border-sky-200">
                   Self-Service Pass
@@ -716,21 +717,21 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 6. HOW THE SYSTEM WORKS (WHITE & AQUA) */}
       {/* ============================================================ */}
-      <section id="workflow" className="relative z-10 py-20 bg-[#F8FCFD]">
+      <section id="workflow" className="relative z-10 py-14 sm:py-20 bg-[#F8FCFD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-200">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-200">
               Operational Workflow
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
-              How IronPulse Works In 4 Steps
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
+              How AmarSadhana GMS Works In 4 Steps
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 font-normal">
+            <p className="text-xs sm:text-base text-slate-600 mt-2 font-normal">
               From gym setup to contactless floor entry and automated accounting in four frictionless steps.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
               {
                 step: '01',
@@ -755,7 +756,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             ].map((s) => (
               <div
                 key={s.step}
-                className="p-6 rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-lg transition-all shadow-xs relative"
+                className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-cyan-100 hover:border-cyan-300 hover:shadow-lg transition-all shadow-xs relative"
               >
                 <div className="text-3xl font-black text-cyan-600 font-mono mb-3">{s.step}</div>
                 <h4 className="text-base font-bold text-slate-900 mb-2">{s.title}</h4>
@@ -769,21 +770,21 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 7. MEMBERSHIP TIERS / PRICING (WHITE & AQUA) */}
       {/* ============================================================ */}
-      <section id="pricing" className="relative z-10 py-20 bg-white border-y border-cyan-100">
+      <section id="pricing" className="relative z-10 py-14 sm:py-20 bg-white border-y border-cyan-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-wider text-teal-800 bg-teal-100 px-3 py-1 rounded-full border border-teal-200">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-teal-800 bg-teal-100 px-3 py-1 rounded-full border border-teal-200">
               Configurable Membership Plans
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
               Standard Membership Packages
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 font-normal">
+            <p className="text-xs sm:text-base text-slate-600 mt-2 font-normal">
               Fully customizable packages out-of-the-box for your gym members.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
               { title: '1 Month Plan', months: '1 Month', price: '₹1,000', badge: 'Standard', desc: 'Full gym floor access & cardio' },
               { title: '3 Months Plan', months: '3 Months', price: '₹2,500', badge: 'Popular', desc: 'Quarterly training with locker facility' },
@@ -792,14 +793,13 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             ].map((plan, idx) => (
               <div
                 key={plan.title}
-                className={`p-6 rounded-3xl bg-white border flex flex-col justify-between transition-all ${
-                  idx === 1
-                    ? 'border-cyan-500 shadow-xl shadow-cyan-600/10 relative scale-[1.02]'
-                    : 'border-cyan-100 hover:border-cyan-300 shadow-sm'
-                }`}
+                className={`p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border flex flex-col justify-between transition-all ${idx === 1
+                    ? 'border-cyan-500 shadow-xl shadow-cyan-600/10 relative lg:scale-[1.02]'
+                    : 'border-cyan-100 hover:border-cyan-300 shadow-xs sm:shadow-sm'
+                  }`}
               >
                 {idx === 1 && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-teal-600 text-white font-extrabold text-[10px] uppercase tracking-wider shadow-sm whitespace-nowrap">
                     Most Popular
                   </div>
                 )}
@@ -831,11 +831,10 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
 
                 <button
                   onClick={() => handleOpenAuthModal('Admin', true)}
-                  className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
-                    idx === 1
+                  className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${idx === 1
                       ? 'bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white shadow-md shadow-cyan-600/25'
                       : 'bg-slate-100 hover:bg-cyan-50 text-slate-800 hover:text-cyan-800 border border-slate-200'
-                  }`}
+                    }`}
                 >
                   Configure in My Gym →
                 </button>
@@ -848,62 +847,62 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 8. ABOUT DEVELOPER SECTION (FEATURED PROFILE FOR ARPIT RAI) */}
       {/* ============================================================ */}
-      <section id="developer" className="relative z-10 py-20 bg-gradient-to-b from-[#F0FDFA] via-[#F8FCFD] to-white">
+      <section id="developer" className="relative z-10 py-14 sm:py-20 bg-gradient-to-b from-[#F0FDFA] via-[#F8FCFD] to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3.5 py-1 rounded-full border border-cyan-200">
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3.5 py-1 rounded-full border border-cyan-200">
               Architect & Full-Stack Engineer
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight mt-3">
               Crafted With Engineering Excellence
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 mt-2 font-normal">
-              Meet the lead architect and engineer behind the IronPulse Gym Management System.
+            <p className="text-xs sm:text-base text-slate-600 mt-2 font-normal">
+              Meet the lead architect and engineer behind the AmarSadhana Gym Management System.
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto bg-white border border-cyan-200 rounded-3xl p-6 sm:p-10 shadow-xl shadow-cyan-950/5 relative overflow-hidden">
+          <div className="max-w-5xl mx-auto bg-white border border-cyan-200 rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-10 shadow-xl shadow-cyan-950/5 relative overflow-hidden">
             {/* Top decorative gradient bar */}
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-cyan-500 via-teal-500 to-cyan-600"></div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              
+
               {/* Left Column: Avatar, Identity & Status */}
               <div className="lg:col-span-4 text-center flex flex-col items-center">
                 <div className="relative mb-4">
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-cyan-500 p-1 shadow-xl shadow-cyan-600/25">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-cyan-500 p-1 shadow-xl shadow-cyan-600/25">
                     <img
                       src="/arpit-rai.png"
                       alt="Arpit Rai - Lead Full-Stack Architect"
-                      className="w-full h-full rounded-[22px] object-cover bg-slate-100"
+                      className="w-full h-full rounded-[18px] sm:rounded-[22px] object-cover bg-slate-100"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300';
                       }}
                     />
                   </div>
-                  <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white shadow-sm" title="Active & Available"></span>
+                  <span className="absolute bottom-1 right-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 border-2 border-white shadow-sm" title="Active & Available"></span>
                 </div>
 
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">Arpit Rai</h3>
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Arpit Rai</h3>
                 <p className="text-xs font-bold text-cyan-700 uppercase tracking-wider mt-0.5">
                   Lead Full-Stack Architect
                 </p>
 
-                <div className="mt-3 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                <div className="mt-2.5 sm:mt-3 inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] sm:text-[11px] font-bold">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   <span>Available for Engineering Roles</span>
                 </div>
 
                 {/* Direct Action Links */}
-                <div className="mt-6 flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full">
+                <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full">
                   <a
                     href="https://github.com/arpitrai38"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-sm"
+                    className="py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center space-x-2 transition-all shadow-xs w-full"
                   >
-                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                     <span>View GitHub Profile</span>
@@ -911,7 +910,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
 
                   <a
                     href="mailto:sadhanamarendra12@gmail.com"
-                    className="py-2.5 px-4 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 font-bold text-xs flex items-center justify-center space-x-2 transition-all"
+                    className="py-2.5 px-4 rounded-xl bg-cyan-50 hover:bg-cyan-100 text-cyan-800 border border-cyan-200 font-bold text-xs flex items-center justify-center space-x-2 transition-all w-full"
                   >
                     <span>✉️</span>
                     <span>Contact via Email</span>
@@ -920,34 +919,34 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
               </div>
 
               {/* Right Column: Technical Bio, System Highlights & Tech Stack */}
-              <div className="lg:col-span-8 space-y-5 lg:pl-6 lg:border-l lg:border-cyan-100">
+              <div className="lg:col-span-8 space-y-4 sm:space-y-5 lg:pl-6 lg:border-l lg:border-cyan-100">
                 <div>
-                  <h4 className="text-lg font-black text-slate-900">Engineering Profile & Philosophy</h4>
+                  <h4 className="text-base sm:text-lg font-black text-slate-900">Engineering Profile & Philosophy</h4>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-2 font-normal">
-                    Passionate software engineer specializing in scalable MERN stack architectures, high-performance web applications, cloud database systems, and secure authentication infrastructure. Designed and engineered the end-to-end IronPulse platform with multi-tenant gym isolation, automated membership life-cycle engines, and mobile-first responsive dashboards.
+                    Passionate software engineer specializing in scalable MERN stack architectures, high-performance web applications, cloud database systems, and secure authentication infrastructure. Designed and engineered the end-to-end AmarSadhana GMS platform with multi-tenant gym isolation, automated membership life-cycle engines, and mobile-first responsive dashboards.
                   </p>
                 </div>
 
                 {/* Key System Highlights */}
                 <div>
-                  <h5 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-2.5">
+                  <h5 className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
                     Architectural Milestones Implemented in this Project:
                   </h5>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-700">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs text-slate-700">
                     <div className="p-2.5 rounded-xl bg-cyan-50/50 border border-cyan-100 flex items-start space-x-2">
-                      <span className="text-cyan-600 font-bold">✓</span>
+                      <span className="text-cyan-600 font-bold shrink-0">✓</span>
                       <span><strong>Multi-Role RBAC:</strong> Granular isolation for Gym Admins, Coaches, and Members.</span>
                     </div>
                     <div className="p-2.5 rounded-xl bg-teal-50/50 border border-teal-100 flex items-start space-x-2">
-                      <span className="text-teal-600 font-bold">✓</span>
+                      <span className="text-teal-600 font-bold shrink-0">✓</span>
                       <span><strong>Collection Guard:</strong> Enforces renewals solely on expired passes to protect revenue telemetry.</span>
                     </div>
                     <div className="p-2.5 rounded-xl bg-sky-50/50 border border-sky-100 flex items-start space-x-2">
-                      <span className="text-sky-600 font-bold">✓</span>
+                      <span className="text-sky-600 font-bold shrink-0">✓</span>
                       <span><strong>Contactless QR:</strong> Sub-second dynamic QR code scanner for front-desk turnstiles.</span>
                     </div>
                     <div className="p-2.5 rounded-xl bg-emerald-50/50 border border-emerald-100 flex items-start space-x-2">
-                      <span className="text-emerald-600 font-bold">✓</span>
+                      <span className="text-emerald-600 font-bold shrink-0">✓</span>
                       <span><strong>Clean Tenancy:</strong> Strict 10-digit phone verification with automated OTP password recovery.</span>
                     </div>
                   </div>
@@ -955,10 +954,10 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
 
                 {/* Core Tech Stack Badges */}
                 <div>
-                  <h5 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
+                  <h5 className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-700 mb-2">
                     Core Technical Stack:
                   </h5>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {[
                       'React.js',
                       'Node.js',
@@ -972,7 +971,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                     ].map((tech) => (
                       <span
                         key={tech}
-                        className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-bold border border-slate-200"
+                        className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] sm:text-xs font-bold border border-slate-200"
                       >
                         {tech}
                       </span>
@@ -989,13 +988,13 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ) */}
       {/* ============================================================ */}
-      <section id="faq" className="relative z-10 py-20 bg-white border-t border-cyan-100">
+      <section id="faq" className="relative z-10 py-14 sm:py-20 bg-white border-t border-cyan-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-200">
+          <div className="text-center mb-8 sm:mb-12">
+            <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-cyan-800 bg-cyan-100 px-3 py-1 rounded-full border border-cyan-200">
               Clear Answers
             </span>
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight mt-3">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-3">
               Frequently Asked Questions
             </h2>
           </div>
@@ -1030,7 +1029,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                 <button
                   type="button"
                   onClick={() => toggleFaq(idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between font-bold text-sm text-slate-800 hover:text-cyan-700 transition-colors"
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between font-bold text-xs sm:text-sm text-slate-800 hover:text-cyan-700 transition-colors"
                 >
                   <span>{faq.q}</span>
                   <span className="text-lg font-mono ml-4 text-cyan-600">
@@ -1051,20 +1050,20 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {/* 10. FOOTER (WHITE & AQUA THEME) */}
       {/* ============================================================ */}
-      <footer className="relative z-10 bg-white border-t border-cyan-100 py-12 text-slate-500 text-xs">
+      <footer className="relative z-10 bg-white border-t border-cyan-100 py-10 sm:py-12 text-slate-500 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-100">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-100 text-center md:text-left">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-600 flex items-center justify-center font-black text-white text-lg shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-teal-600 flex items-center justify-center font-black text-white text-lg shadow-sm shrink-0">
                 ⚡
               </div>
               <div>
-                <span className="font-black text-slate-900 text-base tracking-tight">IRONPULSE GMS</span>
+                <span className="font-black text-slate-900 text-base tracking-tight">AMARSADHANA GMS</span>
                 <p className="text-[10px] text-slate-500">Enterprise Fitness Management Infrastructure</p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 font-semibold">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 font-semibold">
               <a href="#features" className="hover:text-cyan-600 transition-colors">Features</a>
               <a href="#portals" className="hover:text-cyan-600 transition-colors">Portals</a>
               <a href="#workflow" className="hover:text-cyan-600 transition-colors">Workflow</a>
@@ -1085,12 +1084,12 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
             </div>
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
+          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500 text-center sm:text-left">
             <div>
-              © {new Date().getFullYear()} IronPulse GMS. Designed & Architected by <strong>Arpit Rai</strong>. Powered by MongoDB.
+              © {new Date().getFullYear()} AmarSadhana GMS. Designed & Architected by <strong>Arpit Rai</strong>. Powered by MongoDB.
             </div>
             <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
               <span className="text-slate-600 font-medium">All Cloud Services Operational</span>
             </div>
           </div>
@@ -1102,24 +1101,24 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
       {/* ============================================================ */}
       {isAuthModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-md bg-white border border-cyan-100 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-800 max-h-[95vh] overflow-y-auto">
+          <div className="relative w-full max-w-md bg-white border border-cyan-100 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl text-slate-800 max-h-[92vh] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setIsAuthModalOpen(false)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+              className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-800 flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
             >
               ✕
             </button>
 
             {/* Modal Header */}
-            <div className="text-center mb-6">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 to-teal-600 flex items-center justify-center text-white text-xl font-black shadow-lg shadow-cyan-600/25 mb-3">
+            <div className="text-center mb-5 sm:mb-6">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 to-teal-600 flex items-center justify-center text-white text-lg sm:text-xl font-black shadow-lg shadow-cyan-600/25 mb-2.5 sm:mb-3">
                 ⚡
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                {isRegisterMode ? 'Register New Gym Account' : 'Sign In to IronPulse'}
+              <h3 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
+                {isRegisterMode ? 'Register New Gym Account' : 'Sign In to AmarSadhana GMS'}
               </h3>
-              <p className="text-xs text-slate-500 mt-1 font-medium">
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-1 font-medium">
                 {isRegisterMode
                   ? 'Set up a clean, dedicated database for your gym'
                   : 'Enter your account credentials to access your portal'}
@@ -1128,7 +1127,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
 
             {/* Role Tabs (Sign-In Mode) */}
             {!isRegisterMode ? (
-              <div className="grid grid-cols-3 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 mb-5">
+              <div className="grid grid-cols-3 p-1 sm:p-1.5 bg-slate-100 rounded-xl sm:rounded-2xl border border-slate-200 mb-4 sm:mb-5">
                 <button
                   type="button"
                   onClick={() => {
@@ -1136,14 +1135,13 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                     setAuthError('');
                     setAuthSuccess('');
                   }}
-                  className={`py-2 text-xs font-extrabold rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${
-                    modalRole === 'Admin'
-                      ? 'bg-white text-cyan-800 shadow-sm border border-slate-200/80'
+                  className={`py-1.5 sm:py-2 text-[11px] sm:text-xs font-extrabold rounded-lg sm:rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${modalRole === 'Admin'
+                      ? 'bg-white text-cyan-800 shadow-xs border border-slate-200/80'
                       : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   <span>🛡️ Admin</span>
-                  <span className="text-[9px] font-medium opacity-70">Gym Owner</span>
+                  <span className="text-[8px] sm:text-[9px] font-medium opacity-70">Gym Owner</span>
                 </button>
                 <button
                   type="button"
@@ -1152,14 +1150,13 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                     setAuthError('');
                     setAuthSuccess('');
                   }}
-                  className={`py-2 text-xs font-extrabold rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${
-                    modalRole === 'Trainer'
-                      ? 'bg-white text-cyan-800 shadow-sm border border-slate-200/80'
+                  className={`py-1.5 sm:py-2 text-[11px] sm:text-xs font-extrabold rounded-lg sm:rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${modalRole === 'Trainer'
+                      ? 'bg-white text-cyan-800 shadow-xs border border-slate-200/80'
                       : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   <span>🏋️ Trainer</span>
-                  <span className="text-[9px] font-medium opacity-70">Coach</span>
+                  <span className="text-[8px] sm:text-[9px] font-medium opacity-70">Coach</span>
                 </button>
                 <button
                   type="button"
@@ -1168,21 +1165,20 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                     setAuthError('');
                     setAuthSuccess('');
                   }}
-                  className={`py-2 text-xs font-extrabold rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${
-                    modalRole === 'Member'
-                      ? 'bg-white text-cyan-800 shadow-sm border border-slate-200/80'
+                  className={`py-1.5 sm:py-2 text-[11px] sm:text-xs font-extrabold rounded-lg sm:rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${modalRole === 'Member'
+                      ? 'bg-white text-cyan-800 shadow-xs border border-slate-200/80'
                       : 'text-slate-500 hover:text-slate-900'
-                  }`}
+                    }`}
                 >
                   <span>👤 Member</span>
-                  <span className="text-[9px] font-medium opacity-70">Athlete</span>
+                  <span className="text-[8px] sm:text-[9px] font-medium opacity-70">Athlete</span>
                 </button>
               </div>
             ) : (
-              <div className="mb-5 p-3 rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-900 text-xs flex items-center justify-between">
+              <div className="mb-4 sm:mb-5 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-cyan-50 border border-cyan-200 text-cyan-900 text-xs flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="text-base">🛡️</span>
-                  <span className="font-bold">Registering as Gym Administrator</span>
+                  <span className="text-sm sm:text-base">🛡️</span>
+                  <span className="font-bold text-[11px] sm:text-xs">Registering as Gym Administrator</span>
                 </div>
                 <button
                   type="button"
@@ -1191,7 +1187,7 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                     setAuthError('');
                     setAuthSuccess('');
                   }}
-                  className="text-cyan-700 font-bold hover:underline"
+                  className="text-cyan-700 font-bold hover:underline text-[11px] sm:text-xs"
                 >
                   ← Sign In
                 </button>
@@ -1312,13 +1308,12 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                         Phone Number (10 Digits) <span className="text-rose-500">*</span>
                       </label>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          isPhoneValid
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isPhoneValid
                             ? 'bg-emerald-100 text-emerald-800'
                             : registerPhone.length > 0
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-slate-100 text-slate-500'
-                        }`}
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-slate-100 text-slate-500'
+                          }`}
                       >
                         {registerPhone.length}/10 {isPhoneValid && '✓ Valid'}
                       </span>
@@ -1347,8 +1342,8 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                   {isRegisterMode
                     ? 'Official Email Address *'
                     : modalRole === 'Member'
-                    ? '10-Digit Mobile Number or Email *'
-                    : 'Email Address or Mobile *'}
+                      ? '10-Digit Mobile Number or Email *'
+                      : 'Email Address or Mobile *'}
                 </label>
                 <input
                   type={isRegisterMode ? 'email' : 'text'}
@@ -1359,10 +1354,10 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                     isRegisterMode
                       ? 'owner@yourgym.com'
                       : modalRole === 'Member'
-                      ? '9876543210 or member@gmail.com'
-                      : modalRole === 'Trainer'
-                      ? 'trainer@gym.com or 9876543210'
-                      : 'admin@yourgym.com or 9876543210'
+                        ? '9876543210 or member@gmail.com'
+                        : modalRole === 'Trainer'
+                          ? 'trainer@gym.com or 9876543210'
+                          : 'admin@yourgym.com or 9876543210'
                   }
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20"
                 />
@@ -1457,13 +1452,12 @@ export const HomePage = ({ onLaunchGymApp, gymUser, onLogout }) => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Re-enter password"
-                      className={`w-full px-4 py-2.5 pr-10 bg-slate-50 border rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none ${
-                        confirmPassword
+                      className={`w-full px-4 py-2.5 pr-10 bg-slate-50 border rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none ${confirmPassword
                           ? isConfirmPassMatch
                             ? 'border-emerald-400 focus:border-emerald-600'
                             : 'border-rose-300 focus:border-rose-500'
                           : 'border-slate-200 focus:border-cyan-600'
-                      }`}
+                        }`}
                     />
                     <button
                       type="button"

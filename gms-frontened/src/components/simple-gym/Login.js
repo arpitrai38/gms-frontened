@@ -151,7 +151,7 @@ export const Login = ({ onLoginSuccess, onBackToHome }) => {
         <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-800 relative z-10">
+      <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl text-slate-800 relative z-10 max-h-[95vh] overflow-y-auto">
         {/* Brand / Navigation Header */}
         <div className="text-center mb-6">
           {onBackToHome && (
@@ -164,11 +164,11 @@ export const Login = ({ onLoginSuccess, onBackToHome }) => {
             </button>
           )}
 
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-cyan-600/25 mb-3">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-indigo-600 flex items-center justify-center text-white text-xl sm:text-2xl font-black shadow-lg shadow-cyan-600/25 mb-3">
             ⚡
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-            {isRegister ? 'Register Gym Account' : 'Sign In to IronPulse'}
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            {isRegister ? 'Register Gym Account' : 'Sign In to AmarSadhana GMS'}
           </h1>
           <p className="text-xs text-slate-500 mt-1 font-medium">
             {isRegister

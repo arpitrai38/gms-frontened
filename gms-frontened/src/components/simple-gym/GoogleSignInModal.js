@@ -48,8 +48,8 @@ export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onL
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn font-sans">
-      <div className="relative w-full max-w-sm bg-white border border-cyan-100 rounded-3xl p-6 shadow-2xl text-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn font-sans">
+      <div className="relative w-full max-w-sm bg-white border border-cyan-100 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl text-slate-800 max-h-[92vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2.5">

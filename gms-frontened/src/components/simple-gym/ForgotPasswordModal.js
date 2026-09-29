@@ -133,17 +133,17 @@ export const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', initia
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl text-slate-800 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl text-slate-800 max-h-[92vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-black text-xl shadow-xs">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 mr-2">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-black text-lg sm:text-xl shadow-xs shrink-0">
               🔑
             </div>
-            <div>
-              <h3 className="text-base font-black text-slate-900">Forgot Password</h3>
-              <p className="text-xs text-slate-500">Reset your password via 6-digit email OTP</p>
+            <div className="min-w-0">
+              <h3 className="text-sm sm:text-base font-black text-slate-900 truncate">Forgot Password</h3>
+              <p className="text-[11px] sm:text-xs text-slate-500 truncate">Reset password via 6-digit email OTP</p>
             </div>
           </div>
           <button
