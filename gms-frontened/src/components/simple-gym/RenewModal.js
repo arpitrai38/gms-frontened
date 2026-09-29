@@ -7,8 +7,13 @@ export const RenewModal = ({ isOpen, member, onClose, onRenewed }) => {
   const [months, setMonths] = useState(1);
   const [amountPaid, setAmountPaid] = useState(1000);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const isMemberExpired = member ? (member.status === 'Expired' || (member.nextBillDate && member.nextBillDate < todayStr)) : false;
 
   useEffect(() => {
+    setErrorMessage('');
     if (isOpen && member) {
       membershipsAPI.getAll().then((res) => {
         if (res.success && res.data.length > 0) {
@@ -36,6 +41,13 @@ export const RenewModal = ({ isOpen, member, onClose, onRenewed }) => {
 
   const handleRenew = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+
+    if (!isMemberExpired) {
+      setErrorMessage(`Cannot renew active member. Membership is valid until ${member.nextBillDate}. Only expired members can be renewed.`);
+      return;
+    }
+
     setLoading(true);
 
     const res = await membersAPI.renew(member._id || member.id, {
@@ -48,6 +60,8 @@ export const RenewModal = ({ isOpen, member, onClose, onRenewed }) => {
     if (res.success) {
       onRenewed(res.data);
       onClose();
+    } else {
+      setErrorMessage(res.message || 'Failed to renew membership.');
     }
   };
 
@@ -67,13 +81,35 @@ export const RenewModal = ({ isOpen, member, onClose, onRenewed }) => {
           </button>
         </div>
 
+        {/* Error Alert */}
+        {errorMessage && (
+          <div className="mt-3 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start space-x-2">
+            <span className="text-base leading-none">⚠️</span>
+            <div className="font-semibold leading-relaxed flex-1">{errorMessage}</div>
+          </div>
+        )}
+
+        {/* Active Member Restriction Banner */}
+        {!isMemberExpired && (
+          <div className="mt-3 p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs">
+            <div className="font-bold flex items-center space-x-1.5 text-amber-800 mb-1">
+              <span>⚠️</span>
+              <span>Renewal Locked (Member Currently Active)</span>
+            </div>
+            <p className="text-[11px] text-amber-700 leading-relaxed">
+              This member is active until <strong>{member.nextBillDate}</strong>. To prevent false revenue inflation, memberships can only be renewed after expiration.
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleRenew} className="mt-4 space-y-4 text-xs">
           <div>
             <label className="block font-semibold text-slate-700 mb-1">Select Renewal Package</label>
             <select
               value={selectedPlan}
+              disabled={!isMemberExpired}
               onChange={handlePlanChange}
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-400"
             >
               {plans.map((p) => (
                 <option key={p.title} value={p.title}>
@@ -88,9 +124,10 @@ export const RenewModal = ({ isOpen, member, onClose, onRenewed }) => {
             <input
               type="number"
               required
+              disabled={!isMemberExpired}
               value={amountPaid}
               onChange={(e) => setAmountPaid(Number(e.target.value))}
-              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 disabled:bg-slate-100 disabled:text-slate-400"
             />
           </div>
 
@@ -101,10 +138,14 @@ export const RenewModal = ({ isOpen, member, onClose, onRenewed }) => {
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white shadow-lg shadow-cyan-500/25 transition-all disabled:opacity-60"
+            disabled={loading || !isMemberExpired}
+            className="w-full py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white shadow-lg shadow-cyan-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Renewing...' : 'Confirm Renewal & Activate →'}
+            {!isMemberExpired
+              ? '🚫 Renewal Disabled (Member is Active)'
+              : loading
+              ? 'Renewing...'
+              : 'Confirm Renewal & Activate →'}
           </button>
         </form>
       </div>

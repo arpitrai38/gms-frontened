@@ -64,6 +64,13 @@ export const AddMemberModal = ({ isOpen, onClose, onMemberAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+
+    const cleanedMobile = mobileNo.replace(/\D/g, '');
+    if (cleanedMobile.length !== 10) {
+      setErrorMsg('Member mobile number must be exactly 10 digits.');
+      return;
+    }
+
     setLoading(true);
 
     const res = await membersAPI.create({
@@ -137,14 +144,20 @@ export const AddMemberModal = ({ isOpen, onClose, onMemberAdded }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Mobile Number *</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block font-semibold text-slate-700">Mobile Number *</label>
+                <span className={`text-[10px] font-bold ${mobileNo.length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  {mobileNo.length}/10 {mobileNo.length === 10 && '✓'}
+                </span>
+              </div>
               <input
                 type="tel"
                 required
+                maxLength={10}
                 value={mobileNo}
-                onChange={(e) => setMobileNo(e.target.value)}
+                onChange={(e) => setMobileNo(e.target.value.replace(/\D/g, '').slice(0, 10))}
                 placeholder="9876543210"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
               />
             </div>
             <div>

@@ -8,7 +8,8 @@ export const Sidebar = ({
   gymUser,
   onOpenProfile,
   isMobileOpen = false,
-  onCloseMobile
+  onCloseMobile,
+  onNavigateToHome
 }) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -21,11 +22,11 @@ export const Sidebar = ({
 
   const userInitials = gymUser?.userName
     ? gymUser.userName
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
     : 'A';
 
   const handleNavClick = (id) => {
@@ -97,11 +98,10 @@ export const Sidebar = ({
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === item.id
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${activeTab === item.id
                     ? 'bg-cyan-50 text-cyan-800 border border-cyan-200/80 shadow-xs'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 <span className="text-base">{item.icon}</span>
                 <span>{item.label}</span>
@@ -144,9 +144,22 @@ export const Sidebar = ({
             </div>
           </button>
 
+          {onNavigateToHome && (
+            <button
+              type="button"
+              onClick={() => {
+                onNavigateToHome();
+                if (onCloseMobile) onCloseMobile();
+              }}
+              className="w-full mb-2 py-2 px-3 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 transition-all flex items-center justify-center space-x-1.5 shadow-xs"
+            >
+              <span>🌐 Website Home</span>
+            </button>
+          )}
+
           <button
             onClick={onLogout}
-            className="w-full py-2 px-3 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 border border-rose-200 transition-all flex items-center justify-center space-x-1.5"
+            className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center justify-center space-x-1.5 active:scale-95 cursor-pointer shadow-xs"
           >
             <span>🚪 Logout</span>
           </button>

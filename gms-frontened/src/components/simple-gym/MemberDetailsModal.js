@@ -132,21 +132,26 @@ export const MemberDetailsModal = ({ member, onClose, onRenewClick, onMemberUpda
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-slate-100 flex space-x-3">
-          {onRenewClick && (
+        <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3">
+          {onRenewClick && member.status === 'Expired' && (
             <button
               onClick={() => {
                 onClose();
                 onRenewClick(member);
               }}
-              className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white shadow-md shadow-cyan-500/20 transition-all text-center"
+              className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white shadow-md shadow-cyan-500/20 transition-all text-center cursor-pointer"
             >
               🔄 Renew Membership
             </button>
           )}
+          {member.status === 'Active' && (
+            <div className="flex-1 py-2.5 px-3 rounded-xl font-bold text-xs bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center space-x-1.5 text-center">
+              <span>✓ Active Membership (Valid till {member.nextBillDate})</span>
+            </div>
+          )}
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-center"
+            className="py-2.5 px-6 rounded-xl font-bold text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all text-center cursor-pointer"
           >
             Close
           </button>

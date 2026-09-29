@@ -20,25 +20,6 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'admin', initialPlan =
 
   if (!isOpen) return null;
 
-  // Quick Demo credentials
-  const fillDemo = (role) => {
-    setErrorMsg('');
-    setSuccessMsg('');
-    if (role === 'admin') {
-      setActiveTab('admin');
-      setEmail('admin@gym.com');
-      setPassword('admin123');
-    } else if (role === 'trainer') {
-      setActiveTab('trainer');
-      setEmail('trainer@gym.com');
-      setPassword('trainer123');
-    } else if (role === 'member') {
-      setActiveTab('member');
-      setEmail('member@gym.com');
-      setPassword('member123');
-    }
-  };
-
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -103,33 +84,6 @@ export const AuthModal = ({ isOpen, onClose, initialTab = 'admin', initialPlan =
           </button>
         </div>
 
-        {/* Quick Demo Selector */}
-        <div className="px-6 pt-4 pb-2 bg-slate-950/50 border-b border-slate-800/50 flex items-center justify-between">
-          <span className="text-xs text-slate-400 font-medium">⚡ 1-Click Quick Demo:</span>
-          <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() => fillDemo('admin')}
-              className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 transition-all"
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('trainer')}
-              className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all"
-            >
-              Trainer
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('member')}
-              className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all"
-            >
-              Trainee
-            </button>
-          </div>
-        </div>
 
         {/* Role Tabs */}
         <div className="grid grid-cols-4 p-1.5 mx-6 mt-4 bg-slate-950 rounded-2xl border border-slate-800">

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { membersAPI, authAPI } from '../../services/api';
 import { PhotoAvatarSelector } from '../common/PhotoAvatarSelector';
 
-export const MemberProfileModal = ({ isOpen, onClose, memberUser, onMemberUpdated }) => {
+export const MemberProfileModal = ({ isOpen, onClose, memberUser, onMemberUpdated, onLogout }) => {
   const [activeTab, setActiveTab] = useState('profile'); // 'profile' | 'password'
 
   // Profile fields
@@ -183,12 +183,28 @@ export const MemberProfileModal = ({ isOpen, onClose, memberUser, onMemberUpdate
               <p className="text-xs text-slate-500">Update photo, contact details & password</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors"
-          >
-            ✕
-          </button>
+          <div className="flex items-center space-x-2">
+            {onLogout && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onLogout();
+                }}
+                className="py-1.5 px-3 rounded-xl border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer shadow-xs active:scale-95"
+                title="Logout from Account"
+              >
+                <span>🚪</span>
+                <span>Logout</span>
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* First Login Welcome Banner */}
@@ -471,6 +487,26 @@ export const MemberProfileModal = ({ isOpen, onClose, memberUser, onMemberUpdate
               </button>
             </div>
           </form>
+        )}
+
+        {/* Account Session & Logout Footer */}
+        {onLogout && (
+          <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="text-[11px] text-slate-500">
+              Signed in as <strong className="text-slate-800">{memberUser?.name}</strong> (Member ID: {memberUser?.mobileNo || memberUser?.id})
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onLogout();
+              }}
+              className="py-2 px-4 rounded-xl border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 active:scale-95 font-bold text-xs flex items-center justify-center space-x-2 transition-all cursor-pointer shadow-xs"
+            >
+              <span>🚪</span>
+              <span>Sign Out of Member Pass</span>
+            </button>
+          </div>
         )}
       </div>
     </div>

@@ -17,6 +17,13 @@ export const AddTrainerModal = ({ isOpen, onClose, onTrainerAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+
+    const cleanedPhone = phone ? phone.replace(/\D/g, '') : '';
+    if (cleanedPhone && cleanedPhone.length !== 10) {
+      setErrorMsg('Trainer phone number must be exactly 10 digits (or left blank).');
+      return;
+    }
+
     setLoading(true);
 
     const res = await trainersAPI.create({
@@ -112,13 +119,21 @@ export const AddTrainerModal = ({ isOpen, onClose, onTrainerAdded }) => {
             </div>
 
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Mobile / Phone Number</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block font-semibold text-slate-700">Phone Number (10 Digits)</label>
+                {phone.length > 0 && (
+                  <span className={`text-[10px] font-bold ${phone.length === 10 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                    {phone.length}/10 {phone.length === 10 && '✓'}
+                  </span>
+                )}
+              </div>
               <input
                 type="tel"
+                maxLength={10}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                placeholder="9876543210"
+                className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
               />
             </div>
           </div>

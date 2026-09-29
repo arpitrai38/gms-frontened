@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MemberProfileModal } from './MemberProfileModal';
 
-export const MemberView = ({ memberUser, onLogout }) => {
+export const MemberView = ({ memberUser, onLogout, onNavigateToHome }) => {
   const [currentUser, setCurrentUser] = useState(memberUser);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -35,11 +35,11 @@ export const MemberView = ({ memberUser, onLogout }) => {
 
   const initials = currentUser?.name
     ? currentUser.name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
     : 'M';
 
   const handleMemberUpdated = (updated) => {
@@ -66,6 +66,18 @@ export const MemberView = ({ memberUser, onLogout }) => {
         </div>
 
         <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
+          {onNavigateToHome && (
+            <button
+              type="button"
+              onClick={onNavigateToHome}
+              className="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-all flex items-center space-x-1"
+              title="Return to Arpit Rai Portfolio & Home"
+            >
+              <span>🌐</span>
+              <span className="hidden sm:inline">Portfolio & Home</span>
+            </button>
+          )}
+
           <button
             onClick={() => setIsProfileModalOpen(true)}
             className="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-cyan-700 bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-all flex items-center space-x-1"
@@ -77,10 +89,11 @@ export const MemberView = ({ memberUser, onLogout }) => {
 
           <button
             onClick={onLogout}
-            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center space-x-1"
+            className="px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all flex items-center space-x-1 shrink-0 cursor-pointer shadow-xs active:scale-95"
+            title="Logout from Member Pass"
           >
             <span>🚪</span>
-            <span className="hidden sm:inline">Logout</span>
+            <span className="inline">Logout</span>
           </button>
         </div>
       </header>
@@ -189,11 +202,10 @@ export const MemberView = ({ memberUser, onLogout }) => {
               </div>
 
               <span
-                className={`absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase shadow-md ${
-                  isActive
+                className={`absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase shadow-md ${isActive
                     ? 'bg-teal-500 text-white shadow-teal-500/20'
                     : 'bg-rose-500 text-white shadow-rose-500/20'
-                }`}
+                  }`}
               >
                 {isActive ? 'Active' : 'Expired'}
               </span>
@@ -305,6 +317,7 @@ export const MemberView = ({ memberUser, onLogout }) => {
         onClose={() => setIsProfileModalOpen(false)}
         memberUser={currentUser}
         onMemberUpdated={handleMemberUpdated}
+        onLogout={onLogout}
       />
     </div>
   );

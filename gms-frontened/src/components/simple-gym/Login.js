@@ -3,13 +3,18 @@ import { authAPI } from '../../services/api';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 import { GoogleSignInModal } from './GoogleSignInModal';
 
-export const Login = ({ onLoginSuccess }) => {
+export const Login = ({ onLoginSuccess, onBackToHome }) => {
   const [selectedRole, setSelectedRole] = useState('Admin'); // 'Admin' | 'Trainer' | 'Member'
   const [isRegister, setIsRegister] = useState(false);
 
-  // Form states
-  const [emailOrMobile, setEmailOrMobile] = useState('admin@gym.com');
-  const [password, setPassword] = useState('admin123');
+  // Form states (Completely empty - NO demo credentials)
+  const [emailOrMobile, setEmailOrMobile] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Registration specific states
   const [userName, setUserName] = useState('');
   const [gymName, setGymName] = useState('');
   const [phone, setPhone] = useState('');
@@ -22,183 +27,257 @@ export const Login = ({ onLoginSuccess }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Quick 1-Click Demo Fill
-  const fillDemo = (role) => {
-    setSelectedRole(role);
-    setIsRegister(false);
-    setErrorMsg('');
-    setSuccessMsg('');
-    if (role === 'Admin') {
-      setEmailOrMobile('admin@gym.com');
-      setPassword('admin123');
-    } else if (role === 'Trainer') {
-      setEmailOrMobile('trainer@gym.com');
-      setPassword('trainer123');
-    } else if (role === 'Member') {
-      setEmailOrMobile('9876543210');
-      setPassword('Rahul Sharma');
-    }
-  };
+  // Validation helpers for registration
+  const cleanedPhone = phone.replace(/\D/g, '');
+  const isPhoneValid = cleanedPhone.length === 10;
+  const isPassLengthValid = password.length >= 6;
+  const hasPassLetter = /[A-Za-z]/.test(password);
+  const hasPassNumber = /\d/.test(password);
+  const isPassValid = isPassLengthValid && hasPassLetter && hasPassNumber;
+  const isConfirmPassMatch = confirmPassword.length > 0 && password === confirmPassword;
 
   const handleRoleChange = (role) => {
     setSelectedRole(role);
     setIsRegister(false);
-    fillDemo(role);
+    setErrorMsg('');
+    setSuccessMsg('');
+    setEmailOrMobile('');
+    setPassword('');
+    setConfirmPassword('');
+  };
+
+  const handlePhoneChange = (e) => {
+    // Only accept numeric digits, up to 10 digits
+    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digitsOnly);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setSuccessMsg('');
-    setLoading(true);
 
     if (isRegister) {
-      const res = await authAPI.register({ userName, gymName, email: emailOrMobile, password, phone });
+      // 1. Validate Gym Name & Owner Name
+      if (!gymName.trim() || gymName.trim().length < 2) {
+        setErrorMsg('Please enter a valid Gym Business Name (at least 2 characters).');
+        return;
+      }
+      if (!userName.trim() || userName.trim().length < 2) {
+        setErrorMsg('Please enter the Owner/Manager Full Name (at least 2 characters).');
+        return;
+      }
+
+      // 2. Validate Email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailOrMobile.trim() || !emailRegex.test(emailOrMobile.trim())) {
+        setErrorMsg('Please enter a valid email address (e.g. owner@gym.com).');
+        return;
+      }
+
+      // 3. Strict Phone validation: Exactly 10 digits
+      if (!isPhoneValid) {
+        setErrorMsg('Phone number must be exactly 10 digits (numbers only, no spaces or special characters).');
+        return;
+      }
+
+      // 4. Strict Password validation
+      if (!isPassLengthValid) {
+        setErrorMsg('Password must be at least 6 characters long.');
+        return;
+      }
+      if (!hasPassLetter || !hasPassNumber) {
+        setErrorMsg('Password must contain at least one letter (A-Z or a-z) and at least one number (0-9).');
+        return;
+      }
+      if (password !== confirmPassword) {
+        setErrorMsg('Passwords do not match. Please verify your password confirmation.');
+        return;
+      }
+
+      setLoading(true);
+      const res = await authAPI.register({
+        userName: userName.trim(),
+        gymName: gymName.trim(),
+        email: emailOrMobile.trim(),
+        password,
+        phone: cleanedPhone
+      });
       setLoading(false);
+
       if (res.success && res.user) {
+        setSuccessMsg('Account registered successfully! Logging you into your new Gym...');
         localStorage.setItem('gym_app_user', JSON.stringify({ ...res.user, role: 'Admin' }));
-        onLoginSuccess(res.user, 'Admin');
+        setTimeout(() => {
+          onLoginSuccess(res.user, 'Admin');
+        }, 800);
       } else {
-        setErrorMsg(res.message || 'Registration failed.');
+        setErrorMsg(res.message || 'Registration failed. Please check inputs.');
       }
     } else {
-      const res = await authAPI.login(emailOrMobile, password, selectedRole);
+      // Login flow
+      if (!emailOrMobile.trim()) {
+        setErrorMsg(
+          selectedRole === 'Member'
+            ? 'Please enter your registered 10-digit mobile number or email.'
+            : 'Please enter your registered email address or mobile number.'
+        );
+        return;
+      }
+      if (!password) {
+        setErrorMsg('Please enter your account password.');
+        return;
+      }
+
+      setLoading(true);
+      const res = await authAPI.login(emailOrMobile.trim(), password, selectedRole);
       setLoading(false);
+
       if (res.success) {
         const payload = selectedRole === 'Member' ? res.member : res.user;
         localStorage.setItem('gym_app_user', JSON.stringify({ ...payload, role: res.role }));
         onLoginSuccess(payload, res.role);
       } else {
-        setErrorMsg(res.message || 'Invalid credentials.');
+        setErrorMsg(res.message || 'Invalid credentials. Please verify your details and try again.');
       }
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E6F8FA] via-[#F4FBFB] to-[#E0F2FE] flex items-center justify-center p-3 sm:p-6 font-sans text-slate-800">
-      <div className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-cyan-100 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl shadow-cyan-900/10 relative overflow-hidden">
-        {/* Glow Background */}
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-[#0B1528] to-slate-950 flex items-center justify-center p-3 sm:p-6 font-sans text-slate-100">
+      {/* Background ambient lighting */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]"></div>
+      </div>
 
-        {/* Brand Header */}
-        <div className="text-center mb-5 sm:mb-6">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-teal-500 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-cyan-500/25 mb-2.5 sm:mb-3">
-            🏋️
+      <div className="w-full max-w-md bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-2xl text-slate-800 relative z-10">
+        {/* Brand / Navigation Header */}
+        <div className="text-center mb-6">
+          {onBackToHome && (
+            <button
+              type="button"
+              onClick={onBackToHome}
+              className="inline-flex items-center space-x-1.5 text-xs font-bold text-cyan-700 hover:text-cyan-900 mb-3 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-100 hover:bg-cyan-100 transition-all cursor-pointer"
+            >
+              <span>← Back to Website Home</span>
+            </button>
+          )}
+
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-600 via-teal-600 to-indigo-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-cyan-600/25 mb-3">
+            ⚡
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">GYM MANAGEMENT</h1>
-          <p className="text-[11px] sm:text-xs text-slate-500 mt-1 font-medium">Multi-Role Portal (Admin, Trainer & Member)</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            {isRegister ? 'Register Gym Account' : 'Sign In to IronPulse'}
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 font-medium">
+            {isRegister
+              ? 'Create a fresh, dedicated workspace for your gym'
+              : 'Secure access for Gym Owners, Coaches & Members'}
+          </p>
         </div>
 
-        {/* 1-Click Quick Demo Pill */}
-        <div className="mb-4 sm:mb-5 p-2 sm:p-2.5 bg-cyan-50/70 border border-cyan-100 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-          <span className="text-[11px] text-cyan-800 font-bold pl-0.5">⚡ Quick Demo:</span>
-          <div className="flex space-x-1.5 justify-around sm:justify-start">
+        {/* Role Selector Tabs (Only when not in register mode) */}
+        {!isRegister ? (
+          <div className="grid grid-cols-3 p-1.5 bg-slate-100 rounded-2xl border border-slate-200 mb-5">
             <button
               type="button"
-              onClick={() => fillDemo('Admin')}
-              className={`flex-1 sm:flex-none px-2 sm:px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
-                selectedRole === 'Admin' && !isRegister
-                  ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-sm shadow-cyan-500/25'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:text-cyan-700 hover:border-cyan-200'
+              onClick={() => handleRoleChange('Admin')}
+              className={`py-2 text-xs font-extrabold rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${
+                selectedRole === 'Admin'
+                  ? 'bg-white text-cyan-800 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              Admin
+              <span>🛡️ Admin</span>
+              <span className="text-[9px] font-medium opacity-70">Gym Owner</span>
             </button>
             <button
               type="button"
-              onClick={() => fillDemo('Trainer')}
-              className={`flex-1 sm:flex-none px-2 sm:px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
-                selectedRole === 'Trainer' && !isRegister
-                  ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-sm shadow-cyan-500/25'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:text-cyan-700 hover:border-cyan-200'
+              onClick={() => handleRoleChange('Trainer')}
+              className={`py-2 text-xs font-extrabold rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${
+                selectedRole === 'Trainer'
+                  ? 'bg-white text-cyan-800 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              Trainer
+              <span>🏋️ Trainer</span>
+              <span className="text-[9px] font-medium opacity-70">Coach</span>
             </button>
             <button
               type="button"
-              onClick={() => fillDemo('Member')}
-              className={`flex-1 sm:flex-none px-2 sm:px-2.5 py-1 text-[11px] font-bold rounded-lg transition-all ${
-                selectedRole === 'Member' && !isRegister
-                  ? 'bg-gradient-to-r from-cyan-500 to-teal-500 text-white shadow-sm shadow-cyan-500/25'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:text-cyan-700 hover:border-cyan-200'
+              onClick={() => handleRoleChange('Member')}
+              className={`py-2 text-xs font-extrabold rounded-xl transition-all flex flex-col items-center justify-center space-y-0.5 ${
+                selectedRole === 'Member'
+                  ? 'bg-white text-cyan-800 shadow-sm border border-slate-200/80'
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
-              Member
+              <span>👤 Member</span>
+              <span className="text-[9px] font-medium opacity-70">Athlete</span>
             </button>
           </div>
-        </div>
-
-        {/* Role Tabs */}
-        <div className="grid grid-cols-3 p-1 bg-slate-100/80 rounded-xl border border-slate-200/80 mb-5">
-          <button
-            type="button"
-            onClick={() => handleRoleChange('Admin')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all ${
-              selectedRole === 'Admin' && !isRegister
-                ? 'bg-white text-cyan-800 shadow-sm border border-cyan-200'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            🛡️ Admin
-          </button>
-          <button
-            type="button"
-            onClick={() => handleRoleChange('Trainer')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all ${
-              selectedRole === 'Trainer' && !isRegister
-                ? 'bg-white text-cyan-800 shadow-sm border border-cyan-200'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            🏋️ Trainer
-          </button>
-          <button
-            type="button"
-            onClick={() => handleRoleChange('Member')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all ${
-              selectedRole === 'Member' && !isRegister
-                ? 'bg-white text-cyan-800 shadow-sm border border-cyan-200'
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            👤 Member
-          </button>
-        </div>
-
-        {/* Option for Admin to Register New Gym */}
-        {selectedRole === 'Admin' && (
-          <div className="flex justify-end mb-3">
+        ) : (
+          <div className="mb-5 p-3 rounded-2xl bg-cyan-50/80 border border-cyan-200 text-cyan-900 text-xs flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-base">🛡️</span>
+              <span className="font-bold">Registering as Gym Administrator</span>
+            </div>
             <button
               type="button"
-              onClick={() => { setIsRegister(!isRegister); setErrorMsg(''); setSuccessMsg(''); }}
-              className="text-[11px] font-bold text-cyan-600 hover:text-cyan-700 hover:underline"
+              onClick={() => {
+                setIsRegister(false);
+                setErrorMsg('');
+                setSuccessMsg('');
+              }}
+              className="text-cyan-700 font-bold hover:underline"
             >
-              {isRegister ? '← Back to Sign In' : '+ Register New Gym'}
+              ← Sign In
             </button>
           </div>
         )}
 
+        {/* Admin Register / Sign-in Toggle Link */}
+        {selectedRole === 'Admin' && !isRegister && (
+          <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+            <span className="text-xs text-slate-500 font-medium">New gym owner?</span>
+            <button
+              type="button"
+              onClick={() => {
+                setIsRegister(true);
+                setErrorMsg('');
+                setSuccessMsg('');
+              }}
+              className="text-xs font-bold text-cyan-700 hover:text-cyan-900 hover:underline flex items-center space-x-1"
+            >
+              <span>+ Create New Gym Account</span>
+            </button>
+          </div>
+        )}
+
+        {/* Error Alert */}
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs">
-            ⚠️ {errorMsg}
+          <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start space-x-2.5 animate-fadeIn">
+            <span className="text-base leading-none">⚠️</span>
+            <div className="font-semibold leading-relaxed flex-1">{errorMsg}</div>
           </div>
         )}
 
+        {/* Success Alert */}
         {successMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 text-xs">
-            ✓ {successMsg}
+          <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-start space-x-2.5 animate-fadeIn">
+            <span className="text-base leading-none">✓</span>
+            <div className="font-semibold leading-relaxed flex-1">{successMsg}</div>
           </div>
         )}
 
-        {/* Google One-Click Login Button */}
+        {/* Google Authentication Option */}
         <div className="mb-4">
           <button
             type="button"
             onClick={() => setIsGoogleModalOpen(true)}
-            className="w-full py-2.5 px-4 bg-white border border-slate-200 hover:border-cyan-300 hover:bg-slate-50/80 rounded-xl text-xs font-bold text-slate-700 transition-all flex items-center justify-center space-x-2.5 shadow-xs group"
+            className="w-full py-2.5 px-4 bg-white border border-slate-300 hover:border-cyan-500 hover:bg-slate-50/80 rounded-xl text-xs font-bold text-slate-700 transition-all flex items-center justify-center space-x-2.5 shadow-xs group cursor-pointer"
           >
-            {/* Authentic Google G SVG */}
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
@@ -217,8 +296,8 @@ export const Login = ({ onLoginSuccess }) => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span className="group-hover:text-cyan-800">
-              {isRegister ? 'Register with Google' : `Continue with Google as ${selectedRole}`}
+            <span className="group-hover:text-slate-900">
+              {isRegister ? 'Register with Google' : `Sign in with Google (${selectedRole})`}
             </span>
           </button>
         </div>
@@ -227,119 +306,246 @@ export const Login = ({ onLoginSuccess }) => {
         <div className="relative my-4 flex items-center justify-center">
           <div className="w-full border-t border-slate-200"></div>
           <span className="bg-white px-3 text-[10px] uppercase font-bold text-slate-400 absolute">
-            or with credentials
+            or with account credentials
           </span>
         </div>
 
+        {/* Main Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* REGISTRATION FIELDS */}
           {isRegister && (
             <>
+              {/* Gym Name */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Gym Name</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Gym Business Name <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={gymName}
                   onChange={(e) => setGymName(e.target.value)}
-                  placeholder="e.g. IronPulse Fitness"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  placeholder="e.g. IronPulse Fitness Club"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20 transition-all"
                 />
               </div>
+
+              {/* Owner Name */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Owner Name</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  Owner / Administrator Name <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  placeholder="e.g. Alex Mercer"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+                  placeholder="e.g. John Doe"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20 transition-all"
                 />
               </div>
+
+              {/* Contact Phone (10 digits strictly enforced) */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Contact Phone</label>
-                <input
-                  type="text"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 98765 43210"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
-                />
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700">
+                    Phone Number (10 Digits) <span className="text-rose-500">*</span>
+                  </label>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isPhoneValid
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : phone.length > 0
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-slate-100 text-slate-500'
+                    }`}
+                  >
+                    {phone.length}/10 {isPhoneValid && '✓ Valid'}
+                  </span>
+                </div>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3.5 text-slate-400 font-bold text-xs select-none">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    required
+                    maxLength={10}
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    placeholder="9876543210"
+                    className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold tracking-wider placeholder-slate-400 focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                  />
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1">
+                  Only numeric digits allowed. Must be exactly 10 digits.
+                </p>
               </div>
             </>
           )}
 
+          {/* Email / Mobile Field */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              {selectedRole === 'Member' ? 'Mobile Number / Email' : 'Email Address'}
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              {isRegister
+                ? 'Official Email Address *'
+                : selectedRole === 'Member'
+                ? '10-Digit Mobile Number or Email *'
+                : 'Email Address or Mobile *'}
             </label>
             <input
-              type="text"
+              type={isRegister ? 'email' : 'text'}
               required
               value={emailOrMobile}
               onChange={(e) => setEmailOrMobile(e.target.value)}
               placeholder={
-                selectedRole === 'Member'
-                  ? '9876543210 or rahul@gmail.com'
+                isRegister
+                  ? 'owner@yourgym.com'
+                  : selectedRole === 'Member'
+                  ? '9876543210 or member@gmail.com'
                   : selectedRole === 'Trainer'
-                  ? 'trainer@gym.com'
-                  : 'admin@gym.com'
+                  ? 'trainer@gym.com or 9876543210'
+                  : 'admin@yourgym.com or 9876543210'
               }
-              className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20 transition-all"
             />
           </div>
 
+          {/* Password Field */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-slate-700">Password</label>
-              
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-700">
+                Password <span className="text-rose-500">*</span>
+              </label>
+
               {!isRegister && (
                 <button
                   type="button"
                   onClick={() => setIsForgotModalOpen(true)}
-                  className="text-[11px] font-bold text-cyan-600 hover:text-cyan-800 hover:underline"
+                  className="text-[11px] font-bold text-cyan-700 hover:text-cyan-900 hover:underline"
                 >
                   Forgot Password?
                 </button>
               )}
             </div>
 
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={
-                (selectedRole === 'Member' || selectedRole === 'Trainer')
-                  ? 'e.g. Your Registered Name'
-                  : '••••••••'
-              }
-              className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={
+                  (selectedRole === 'Member' || selectedRole === 'Trainer') && !isRegister
+                    ? 'Enter password (first time: your name)'
+                    : '••••••••'
+                }
+                className="w-full px-4 py-2.5 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-sm p-1 focus:outline-none"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+
+            {/* Registration Password Rules Checklist */}
+            {isRegister && (
+              <div className="mt-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-[11px]">
+                <div className="font-bold text-slate-700 mb-1 text-[10px] uppercase tracking-wider">
+                  Password Requirements:
+                </div>
+                <div className={`flex items-center space-x-1.5 ${isPassLengthValid ? 'text-emerald-700 font-semibold' : 'text-slate-500'}`}>
+                  <span>{isPassLengthValid ? '✓' : '○'}</span>
+                  <span>Minimum 6 characters</span>
+                </div>
+                <div className={`flex items-center space-x-1.5 ${hasPassLetter ? 'text-emerald-700 font-semibold' : 'text-slate-500'}`}>
+                  <span>{hasPassLetter ? '✓' : '○'}</span>
+                  <span>Contains at least one letter (a-z, A-Z)</span>
+                </div>
+                <div className={`flex items-center space-x-1.5 ${hasPassNumber ? 'text-emerald-700 font-semibold' : 'text-slate-500'}`}>
+                  <span>{hasPassNumber ? '✓' : '○'}</span>
+                  <span>Contains at least one number (0-9)</span>
+                </div>
+              </div>
+            )}
 
             {(selectedRole === 'Member' || selectedRole === 'Trainer') && !isRegister && (
-              <p className="text-[10px] text-cyan-700 font-bold mt-1">
-                Tip: For first-time login, your initial password is your registered Name.
+              <p className="text-[10px] text-cyan-800 font-semibold mt-1.5">
+                💡 Tip: If you were enrolled by your Gym Admin, your initial login password is your registered Name.
               </p>
             )}
           </div>
 
+          {/* Confirm Password Field (Registration Mode) */}
+          {isRegister && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700">
+                  Confirm Password <span className="text-rose-500">*</span>
+                </label>
+                {confirmPassword && (
+                  <span className={`text-[10px] font-bold ${isConfirmPassMatch ? 'text-emerald-700' : 'text-rose-600'}`}>
+                    {isConfirmPassMatch ? '✓ Passwords match' : '✗ Passwords do not match'}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter your password"
+                  className={`w-full px-4 py-2.5 pr-10 bg-slate-50 border rounded-xl text-xs text-slate-900 placeholder-slate-400 font-medium focus:bg-white focus:outline-none transition-all ${
+                    confirmPassword
+                      ? isConfirmPassMatch
+                        ? 'border-emerald-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20'
+                        : 'border-rose-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20'
+                      : 'border-slate-200 focus:border-cyan-600 focus:ring-2 focus:ring-cyan-500/20'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-sm p-1 focus:outline-none"
+                  title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white shadow-lg shadow-cyan-500/25 transition-all disabled:opacity-60 mt-2 hover:scale-[1.01] active:scale-[0.99]"
+            className="w-full py-3.5 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-600 via-teal-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white shadow-lg shadow-cyan-600/25 transition-all disabled:opacity-60 mt-3 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
           >
-            {loading
-              ? 'Authenticating...'
-              : isRegister
-              ? 'Create Gym Account →'
-              : `Sign In as ${selectedRole} →`}
+            {loading ? (
+              <span className="flex items-center justify-center space-x-2">
+                <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>Processing...</span>
+              </span>
+            ) : isRegister ? (
+              'Create Gym Account & Launch Workspace →'
+            ) : (
+              `Sign In as ${selectedRole} →`
+            )}
           </button>
         </form>
 
-        <p className="text-center text-[11px] text-slate-400 mt-6">
-          Multi-Role Gym Management System • Powered by MongoDB
-        </p>
+        {/* Footer info */}
+        <div className="text-center text-[11px] text-slate-400 mt-6 pt-4 border-t border-slate-100">
+          IronPulse Gym Management ERP • Secure Cloud Database
+        </div>
       </div>
 
       {/* Forgot Password OTP Modal */}

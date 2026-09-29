@@ -142,12 +142,15 @@ export const Members = ({ onOpenAddMember, onViewMember, onRenewMember }) => {
                         >
                           Details
                         </button>
-                        <button
-                          onClick={() => onRenewMember(m)}
-                          className="px-2.5 py-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-lg text-xs font-semibold transition-colors"
-                        >
-                          Renew
-                        </button>
+                        {m.status === 'Expired' && (
+                          <button
+                            onClick={() => onRenewMember(m)}
+                            className="px-2.5 py-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-lg text-xs font-semibold transition-colors shadow-2xs"
+                            title="Renew expired membership"
+                          >
+                            Renew
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDelete(m._id, m.name)}
                           className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-semibold transition-colors"
@@ -216,12 +219,15 @@ export const Members = ({ onOpenAddMember, onViewMember, onRenewMember }) => {
                     >
                       Details
                     </button>
-                    <button
-                      onClick={() => onRenewMember(m)}
-                      className="px-2.5 py-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-lg text-xs font-semibold"
-                    >
-                      Renew
-                    </button>
+                    {m.status === 'Expired' && (
+                      <button
+                        onClick={() => onRenewMember(m)}
+                        className="px-2.5 py-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 rounded-lg text-xs font-semibold"
+                        title="Renew expired membership"
+                      >
+                        Renew
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDelete(m._id, m.name)}
                       className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-xs font-semibold"

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
 
+import { HomePage } from './components/home/HomePage';
+
 // Simple Gym Components matching CodingHunger Series & Multi-role Portals
 import { Login } from './components/simple-gym/Login';
 import { Sidebar } from './components/simple-gym/Sidebar';
@@ -20,6 +22,7 @@ import { Attendance } from './components/simple-gym/Attendance';
 import { Trainers } from './components/simple-gym/Trainers';
 
 function App() {
+  const [currentView, setCurrentView] = useState('home'); // 'home' | 'gym'
   const [gymUser, setGymUser] = useState(() => {
     try {
       const saved = localStorage.getItem('gym_app_user') || localStorage.getItem('gym_owner_user');
@@ -41,6 +44,7 @@ function App() {
     const userWithRole = { ...user, role: role || user.role || 'Admin' };
     localStorage.setItem('gym_app_user', JSON.stringify(userWithRole));
     setGymUser(userWithRole);
+    setCurrentView('gym');
   };
 
   const handleLogout = () => {
@@ -48,6 +52,14 @@ function App() {
     localStorage.removeItem('gym_owner_user');
     setGymUser(null);
     setActiveTab('dashboard');
+    setCurrentView('home');
+  };
+
+  const handleLaunchGymApp = (user, role) => {
+    if (user) {
+      handleLoginSuccess(user, role);
+    }
+    setCurrentView('gym');
   };
 
   const handleMemberAdded = () => {
@@ -58,24 +70,52 @@ function App() {
     setRefreshTrigger((prev) => prev + 1);
   };
 
-  // 1. If not logged in -> Show Multi-Role Login Form
+  // 1. Default Landing: Arpit Rai Portfolio & Gym ERP Homepage (GRS Aesthetic)
+  if (currentView === 'home') {
+    return (
+      <HomePage
+        onLaunchGymApp={handleLaunchGymApp}
+        gymUser={gymUser}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  // 2. If in gym mode but not logged in -> Show Multi-Role Login Form
   if (!gymUser) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <Login
+        onLoginSuccess={handleLoginSuccess}
+        onBackToHome={() => setCurrentView('home')}
+      />
+    );
   }
 
   const role = gymUser.role || 'Admin';
 
-  // 2. If Trainer -> Show Trainer Portal
+  // 3. If Trainer -> Show Trainer Portal
   if (role === 'Trainer') {
-    return <TrainerView trainerUser={gymUser} onLogout={handleLogout} />;
+    return (
+      <TrainerView
+        trainerUser={gymUser}
+        onLogout={handleLogout}
+        onNavigateToHome={() => setCurrentView('home')}
+      />
+    );
   }
 
-  // 3. If Member -> Show Member Digital Card & Pass
+  // 4. If Member -> Show Member Digital Card & Pass
   if (role === 'Member') {
-    return <MemberView memberUser={gymUser} onLogout={handleLogout} />;
+    return (
+      <MemberView
+        memberUser={gymUser}
+        onLogout={handleLogout}
+        onNavigateToHome={() => setCurrentView('home')}
+      />
+    );
   }
 
-  // 4. Default: Admin Portal (Full Gym Management)
+  // 5. Default: Admin Portal (Full Gym Management)
   return (
     <div className="min-h-screen bg-[#F0F7F9] text-slate-800 flex font-sans relative">
       {/* SIDEBAR (Desktop sticky + Mobile slide-over drawer) */}
@@ -88,6 +128,7 @@ function App() {
         gymUser={gymUser}
         isMobileOpen={isMobileNavOpen}
         onCloseMobile={() => setIsMobileNavOpen(false)}
+        onNavigateToHome={() => setCurrentView('home')}
       />
 
       {/* MAIN CONTENT AREA */}
@@ -98,17 +139,19 @@ function App() {
             activeTab === 'dashboard'
               ? 'Executive Gym Dashboard'
               : activeTab === 'attendance'
-              ? 'Daily Attendance & Floor Occupancy'
-              : activeTab === 'members'
-              ? 'All Registered Members'
-              : activeTab === 'trainers'
-              ? 'Gym Trainers & Coaches'
-              : activeTab === 'expired'
-              ? 'Expired & Due Memberships'
-              : 'Membership Packages'
+                ? 'Daily Attendance & Floor Occupancy'
+                : activeTab === 'members'
+                  ? 'All Registered Members'
+                  : activeTab === 'trainers'
+                    ? 'Gym Trainers & Coaches'
+                    : activeTab === 'expired'
+                      ? 'Expired & Due Memberships'
+                      : 'Membership Packages'
           }
           onOpenAddMember={() => setIsAddModalOpen(true)}
           onToggleMobileNav={() => setIsMobileNavOpen((prev) => !prev)}
+          onNavigateToHome={() => setCurrentView('home')}
+          onLogout={handleLogout}
         />
 
         {/* View Switcher (with bottom padding on mobile for bottom navigation bar) */}
@@ -155,9 +198,8 @@ function App() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/90 py-1.5 px-3 flex justify-around items-center shadow-lg shadow-slate-900/10">
         <button
           onClick={() => setActiveTab('dashboard')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${
-            activeTab === 'dashboard' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
-          }`}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${activeTab === 'dashboard' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+            }`}
         >
           <span className="text-lg">📊</span>
           <span className="text-[10px]">Home</span>
@@ -165,9 +207,8 @@ function App() {
 
         <button
           onClick={() => setActiveTab('attendance')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${
-            activeTab === 'attendance' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
-          }`}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${activeTab === 'attendance' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+            }`}
         >
           <span className="text-lg">📅</span>
           <span className="text-[10px]">Attendance</span>
@@ -187,9 +228,8 @@ function App() {
 
         <button
           onClick={() => setActiveTab('members')}
-          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${
-            activeTab === 'members' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
-          }`}
+          className={`flex flex-col items-center py-1 px-2 rounded-xl transition-all ${activeTab === 'members' ? 'text-cyan-700 font-bold' : 'text-slate-500 hover:text-slate-800'
+            }`}
         >
           <span className="text-lg">👥</span>
           <span className="text-[10px]">Members</span>
@@ -230,6 +270,7 @@ function App() {
         onClose={() => setIsProfileModalOpen(false)}
         gymUser={gymUser}
         onProfileUpdated={(updated) => setGymUser(updated)}
+        onLogout={handleLogout}
       />
     </div>
   );

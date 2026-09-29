@@ -2,50 +2,36 @@ import React, { useState } from 'react';
 import { authAPI } from '../../services/api';
 
 export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onLoginSuccess }) => {
-  const [mode, setMode] = useState('picker'); // 'picker' | 'custom'
-  const [customEmail, setCustomEmail] = useState('');
-  const [customName, setCustomName] = useState('');
-  const [customGymName, setCustomGymName] = useState('');
-  const [customPhone, setCustomPhone] = useState('');
+  const [googleEmail, setGoogleEmail] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [gymName, setGymName] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
-  // Preset Google Accounts tailored for quick 1-click test
-  const presetGoogleAccounts = [
-    {
-      name: selectedRole === 'Admin' ? 'Alex Mercer' : selectedRole === 'Trainer' ? 'Coach Vikram' : 'Rahul Sharma',
-      email: selectedRole === 'Admin' ? 'admin@gym.com' : selectedRole === 'Trainer' ? 'trainer@gym.com' : 'rahul@gmail.com',
-      avatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c',
-      subtitle: `${selectedRole} Account`
-    },
-    {
-      name: 'Priya Patel',
-      email: 'priya@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
-      subtitle: 'Member Account'
-    },
-    {
-      name: 'Vikram Singh',
-      email: 'vikram.singh@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      subtitle: 'Google Workspace Account'
+  const handleGoogleLogin = async (e) => {
+    if (e) e.preventDefault();
+    if (!googleEmail || !googleEmail.includes('@')) {
+      setErrorMsg('Please enter a valid Google email address.');
+      return;
     }
-  ];
 
-  const handleSelectAccount = async (account) => {
     setLoading(true);
     setErrorMsg('');
 
+    const cleanEmail = googleEmail.toLowerCase().trim();
+    const cleanName = fullName.trim() || cleanEmail.split('@')[0];
+
     const payload = {
-      email: account.email,
-      name: account.name,
-      picture: account.avatar || '',
-      googleId: 'google_' + Math.abs(account.email.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0)),
+      email: cleanEmail,
+      name: cleanName,
+      picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=0D9488&color=fff`,
+      googleId: 'google_' + Math.abs(cleanEmail.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0)),
       role: selectedRole,
-      gymName: customGymName || `${account.name}'s Fitness Club`,
-      phone: account.phone || customPhone || ''
+      gymName: gymName.trim() || `${cleanName}'s Fitness Club`,
+      phone: phone.trim()
     };
 
     const res = await authAPI.googleLogin(payload);
@@ -53,38 +39,27 @@ export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onL
 
     if (res.success) {
       const userPayload = selectedRole === 'Member' ? res.member : res.user;
-      localStorage.setItem('gym_app_user', JSON.stringify({ ...userPayload, role: res.role }));
-      onLoginSuccess(userPayload, res.role);
+      localStorage.setItem('gym_app_user', JSON.stringify({ ...userPayload, role: res.role || selectedRole }));
+      onLoginSuccess(userPayload, res.role || selectedRole);
       onClose();
     } else {
       setErrorMsg(res.message || 'Google authentication failed.');
     }
   };
 
-  const handleCustomSubmit = async (e) => {
-    e.preventDefault();
-    if (!customEmail || !customEmail.includes('@')) {
-      setErrorMsg('Please enter a valid Google email address.');
-      return;
-    }
-
-    const account = {
-      name: customName.trim() || customEmail.split('@')[0],
-      email: customEmail.trim(),
-      avatar: 'https://lh3.googleusercontent.com/a/default-user=s96-c'
-    };
-
-    await handleSelectAccount(account);
+  const handleQuickAccount = (email, name) => {
+    setGoogleEmail(email);
+    setFullName(name);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fadeIn font-sans">
-      <div className="relative w-full max-w-sm bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl text-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fadeIn font-sans">
+      <div className="relative w-full max-w-sm bg-white border border-cyan-100 rounded-3xl p-6 shadow-2xl text-slate-800">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2.5">
             {/* Google G Logo SVG */}
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -104,12 +79,12 @@ export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onL
             </svg>
             <div>
               <h3 className="text-sm font-black text-slate-900">Sign in with Google</h3>
-              <p className="text-[10px] text-slate-500">Choose an account for {selectedRole} Portal</p>
+              <p className="text-[10px] text-cyan-700 font-semibold">{selectedRole} Portal Access</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-slate-100 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors text-xs"
+            className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors text-xs cursor-pointer"
           >
             ✕
           </button>
@@ -121,119 +96,86 @@ export const GoogleSignInModal = ({ isOpen, onClose, selectedRole = 'Admin', onL
           </div>
         )}
 
-        {/* MODE 1: CHOOSE PRESET OR ANOTHER GOOGLE ACCOUNT */}
-        {mode === 'picker' && (
-          <div className="mt-4 space-y-2">
-            <p className="text-xs font-semibold text-slate-600 mb-2">Select Google Account:</p>
-            {presetGoogleAccounts.map((acc, idx) => (
-              <button
-                key={idx}
-                type="button"
-                disabled={loading}
-                onClick={() => handleSelectAccount(acc)}
-                className="w-full flex items-center space-x-3 p-3 rounded-2xl hover:bg-slate-50 border border-slate-200/90 transition-all text-left group hover:border-cyan-400"
-              >
-                <img
-                  src={acc.avatar}
-                  alt={acc.name}
-                  className="w-8 h-8 rounded-full object-cover border border-slate-200"
-                />
-                <div className="flex-1 truncate">
-                  <p className="text-xs font-bold text-slate-800 group-hover:text-cyan-700 truncate">
-                    {acc.name}
-                  </p>
-                  <p className="text-[10px] text-slate-400 truncate">{acc.email}</p>
-                </div>
-                <span className="text-[10px] text-slate-400 font-medium">{acc.subtitle}</span>
-              </button>
-            ))}
-
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => { setMode('custom'); setErrorMsg(''); }}
-              className="w-full flex items-center justify-center space-x-2 p-2.5 rounded-xl border border-dashed border-slate-300 text-slate-600 hover:text-cyan-700 hover:border-cyan-400 text-xs font-bold transition-all mt-2"
-            >
-              <span>+</span>
-              <span>Use another Google account</span>
-            </button>
-          </div>
-        )}
-
-        {/* MODE 2: CUSTOM GOOGLE ACCOUNT FORM */}
-        {mode === 'custom' && (
-          <form onSubmit={handleCustomSubmit} className="mt-4 space-y-3 text-xs">
-            <div>
-              <label className="block font-semibold text-slate-700 mb-1">Google Email Address *</label>
-              <input
-                type="email"
-                required
-                value={customEmail}
-                onChange={(e) => setCustomEmail(e.target.value)}
-                placeholder="yourname@gmail.com"
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-              />
+        {/* Real Quick Account Suggestion */}
+        <div className="mt-3.5 mb-2">
+          <button
+            type="button"
+            onClick={() => handleQuickAccount('sadhanamarendra12@gmail.com', 'Arpit Rai')}
+            className="w-full flex items-center space-x-2.5 p-2 rounded-xl bg-cyan-50/60 hover:bg-cyan-100/60 border border-cyan-100 transition-all text-left cursor-pointer group"
+          >
+            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-600 to-teal-600 text-white flex items-center justify-center font-black text-[10px] shrink-0">
+              AR
             </div>
+            <div className="flex-1 truncate">
+              <p className="text-[11px] font-bold text-slate-800 group-hover:text-cyan-800 truncate">
+                Arpit Rai (sadhanamarendra12@gmail.com)
+              </p>
+              <p className="text-[9px] text-cyan-700">Click to autofill your account</p>
+            </div>
+          </button>
+        </div>
 
+        <form onSubmit={handleGoogleLogin} className="space-y-3 text-xs mt-3">
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1">Google Email Address *</label>
+            <input
+              type="email"
+              required
+              value={googleEmail}
+              onChange={(e) => setGoogleEmail(e.target.value)}
+              placeholder="e.g. yourname@gmail.com"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-xs"
+            />
+          </div>
+
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1">Full Name</label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="e.g. Arpit Rai"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-xs"
+            />
+          </div>
+
+          {selectedRole === 'Admin' && (
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Your Full Name</label>
+              <label className="block font-semibold text-slate-700 mb-1">Gym Name (Optional)</label>
               <input
                 type="text"
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                placeholder="e.g. John Doe"
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                value={gymName}
+                onChange={(e) => setGymName(e.target.value)}
+                placeholder="e.g. IronPulse Fitness"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-xs"
               />
             </div>
+          )}
 
-            {selectedRole === 'Admin' && (
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Gym Name (If registering fresh)</label>
-                <input
-                  type="text"
-                  value={customGymName}
-                  onChange={(e) => setCustomGymName(e.target.value)}
-                  placeholder="e.g. PowerGym Fitness"
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-                />
-              </div>
-            )}
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1">10-Digit Phone (Optional)</label>
+            <input
+              type="tel"
+              maxLength={10}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              placeholder="e.g. 9876543210"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-xs font-mono"
+            />
+          </div>
 
-            {(selectedRole === 'Member' || selectedRole === 'Trainer') && (
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Mobile / Contact Phone (Optional)</label>
-                <input
-                  type="tel"
-                  value={customPhone}
-                  onChange={(e) => setCustomPhone(e.target.value)}
-                  placeholder="e.g. 9876543210"
-                  className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-                />
-              </div>
-            )}
-
-            <div className="pt-2 flex space-x-2">
-              <button
-                type="button"
-                onClick={() => setMode('picker')}
-                className="flex-1 py-2 rounded-xl border border-slate-200 font-bold text-xs text-slate-600 hover:bg-slate-50 transition-all"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-2 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white shadow-md shadow-cyan-500/20 transition-all disabled:opacity-60"
-              >
-                {loading ? 'Signing In...' : 'Continue →'}
-              </button>
-            </div>
-          </form>
-        )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 rounded-xl font-bold text-xs bg-gradient-to-r from-cyan-600 via-teal-600 to-cyan-500 hover:from-cyan-500 hover:to-teal-500 text-white shadow-md shadow-cyan-600/20 transition-all disabled:opacity-60 cursor-pointer mt-2"
+          >
+            {loading ? 'Authenticating with Google...' : `Sign in with Google as ${selectedRole} →`}
+          </button>
+        </form>
 
         <div className="mt-4 pt-3 border-t border-slate-100 text-center">
           <p className="text-[10px] text-slate-400">
-            Protected by Google OAuth • One-Click Access
+            Protected by Google OAuth • One-Click Authentication
           </p>
         </div>
       </div>

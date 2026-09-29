@@ -136,12 +136,15 @@ app.post('/api/auth/login', async (req, res) => {
 
     // 3. ADMIN LOGIN
     const adminUser = await GymUser.findOne({
-      email: input.toLowerCase(),
-      role: 'Admin'
+      role: 'Admin',
+      $or: [
+        { email: input.toLowerCase() },
+        { phone: input }
+      ]
     });
 
     if (!adminUser || adminUser.password !== password) {
-      return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+      return res.status(401).json({ success: false, message: 'Invalid admin credentials. Please check your email/mobile and password.' });
     }
 
     res.json({
@@ -165,26 +168,62 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Gym Owner Signup (Always starts completely fresh and blank)
+// Gym Owner Signup (Always starts completely fresh and blank with strict validation)
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { userName, gymName, email, password, phone, profilePic } = req.body;
-    if (!userName || !gymName || !email || !password) {
-      return res.status(400).json({ success: false, message: 'All fields are required' });
+
+    const trimmedUser = (userName || '').trim();
+    const trimmedGym = (gymName || '').trim();
+    const trimmedEmail = (email || '').toLowerCase().trim();
+    const cleanedPhone = (phone || '').replace(/\D/g, '');
+
+    // 1. Name & Gym validations
+    if (!trimmedUser || trimmedUser.length < 2) {
+      return res.status(400).json({ success: false, message: 'Owner name is required and must be at least 2 characters' });
+    }
+    if (!trimmedGym || trimmedGym.length < 2) {
+      return res.status(400).json({ success: false, message: 'Gym name is required and must be at least 2 characters' });
     }
 
-    const existing = await GymUser.findOne({ email: email.toLowerCase().trim() });
-    if (existing) {
-      return res.status(400).json({ success: false, message: 'An account with this email already exists' });
+    // 2. Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid email address' });
+    }
+
+    // 3. Phone validation: Only exactly 10 digits
+    if (!cleanedPhone || cleanedPhone.length !== 10) {
+      return res.status(400).json({ success: false, message: 'Phone number must be exactly 10 digits (e.g. 9876543210)' });
+    }
+
+    // 4. Password validation: minimum 6 chars, contains at least one letter and at least one number
+    if (!password || password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+    }
+    if (!/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      return res.status(400).json({ success: false, message: 'Password must contain at least one letter and at least one number' });
+    }
+
+    // Check duplicate email
+    const existingEmail = await GymUser.findOne({ email: trimmedEmail });
+    if (existingEmail) {
+      return res.status(400).json({ success: false, message: 'An account with this email address already exists' });
+    }
+
+    // Check duplicate phone
+    const existingPhone = await GymUser.findOne({ phone: cleanedPhone });
+    if (existingPhone) {
+      return res.status(400).json({ success: false, message: 'An account with this phone number already exists' });
     }
 
     const newUser = await GymUser.create({
-      userName: userName.trim(),
-      gymName: gymName.trim(),
-      email: email.toLowerCase().trim(),
+      userName: trimmedUser,
+      gymName: trimmedGym,
+      email: trimmedEmail,
       password,
       role: 'Admin',
-      phone: phone || '',
+      phone: cleanedPhone,
       profilePic: profilePic || ''
     });
 
@@ -237,12 +276,12 @@ app.post('/api/auth/google', async (req, res) => {
       let gym = await GymUser.findOne({ role: 'Admin' });
       if (!gym) {
         gym = await GymUser.create({
-          userName: 'Gym Administrator',
-          gymName: 'IronPulse Fitness Club',
-          email: 'admin@gym.com',
-          password: 'admin123',
+          userName: displayName || 'Gym Administrator',
+          gymName: gymName || 'IronPulse Fitness Club',
+          email: cleanEmail,
+          password: `auth_google_${Date.now()}`,
           role: 'Admin',
-          phone: '+91 98765 43210'
+          phone: phone || ''
         });
         await Membership.create([
           { gymId: gym._id.toString(), title: '1 Month Plan', months: 1, price: 1000, description: 'Standard monthly gym access & general cardio' },
@@ -987,6 +1026,16 @@ app.post('/api/members', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Name, mobile number, and membership plan are required' });
     }
 
+    const cleanedMobile = (mobileNo || '').replace(/\D/g, '');
+    if (cleanedMobile.length !== 10) {
+      return res.status(400).json({ success: false, message: 'Member mobile number must be exactly 10 digits (e.g. 9876543210)' });
+    }
+
+    const existingInGym = await Member.findOne({ gymId, mobileNo: cleanedMobile });
+    if (existingInGym) {
+      return res.status(400).json({ success: false, message: `Member with mobile number ${cleanedMobile} is already registered in this gym` });
+    }
+
     const joinDateObj = joiningDate ? new Date(joiningDate) : new Date();
     const joinDateStr = joinDateObj.toISOString().split('T')[0];
     const monthsToAdd = Number(membershipMonths) || 1;
@@ -1005,7 +1054,7 @@ app.post('/api/members', async (req, res) => {
     const newMember = await Member.create({
       gymId,
       name: memberName,
-      mobileNo,
+      mobileNo: cleanedMobile,
       email: email || '',
       password: defaultPassword,
       isFirstLogin: true,
@@ -1115,12 +1164,23 @@ app.delete('/api/members/:id', async (req, res) => {
   }
 });
 
-// Renew Member Membership
+// Renew Member Membership (ONLY Allowed for Expired Members)
 app.put('/api/members/:id/renew', async (req, res) => {
   try {
     const { membershipPlan, membershipMonths, amountPaid } = req.body;
     const member = await Member.findById(req.params.id);
     if (!member) return res.status(404).json({ success: false, message: 'Member not found' });
+
+    // Validate that membership is expired before permitting renewal
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isExpired = member.status === 'Expired' || (member.nextBillDate && member.nextBillDate < todayStr);
+
+    if (!isExpired) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot renew an active membership. Member is currently active until ${member.nextBillDate}. Renewals can only be initiated once the membership expires to prevent premature collection inflation.`
+      });
+    }
 
     const monthsToAdd = Number(membershipMonths) || member.membershipMonths || 1;
     const planTitle = membershipPlan || member.membershipPlan;
@@ -1139,11 +1199,12 @@ app.put('/api/members/:id/renew', async (req, res) => {
     }
     await member.save();
 
-    res.json({ success: true, data: member, message: `Membership renewed until ${newBillDate}` });
+    res.json({ success: true, data: member, message: `Membership successfully renewed until ${newBillDate}` });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+
 
 // -------------------------------------------------------------
 // 4. MEMBERSHIP PLANS (Scoped to Gym)

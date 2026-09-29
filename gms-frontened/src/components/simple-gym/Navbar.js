@@ -1,8 +1,8 @@
 import React from 'react';
 
-export const Navbar = ({ title, search, setSearch, onOpenAddMember, onToggleMobileNav }) => {
+export const Navbar = ({ title, search, setSearch, onOpenAddMember, onToggleMobileNav, onNavigateToHome, onLogout }) => {
   return (
-    <header className="h-16 bg-white/95 backdrop-blur border-b border-slate-200/90 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-10 shadow-xs">
+    <header className="h-16 bg-white/95 backdrop-blur border-b border-slate-200/90 px-3 sm:px-6 flex items-center justify-between sticky top-0 z-20 shadow-xs">
       <div className="flex items-center space-x-2 sm:space-x-3 truncate">
         {/* Mobile Hamburger Menu Button */}
         <button
@@ -22,6 +22,18 @@ export const Navbar = ({ title, search, setSearch, onOpenAddMember, onToggleMobi
       </div>
 
       <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        {onNavigateToHome && (
+          <button
+            type="button"
+            onClick={onNavigateToHome}
+            className="py-1.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs shadow-xs transition-all flex items-center space-x-1 shrink-0"
+            title="Return to Website Home"
+          >
+            <span>🌐</span>
+            <span className="hidden sm:inline">Website Home</span>
+          </button>
+        )}
+
         {setSearch && (
           <div className="relative w-36 sm:w-60">
             <input
@@ -36,12 +48,24 @@ export const Navbar = ({ title, search, setSearch, onOpenAddMember, onToggleMobi
 
         <button
           onClick={onOpenAddMember}
-          className="py-1.5 px-3 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-white font-bold text-xs shadow-sm shadow-cyan-500/20 transition-all flex items-center space-x-1 shrink-0 whitespace-nowrap"
+          className="py-1.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold text-xs shadow-sm shadow-cyan-500/20 transition-all flex items-center space-x-1 shrink-0 whitespace-nowrap active:scale-95"
         >
           <span>+</span>
           <span className="hidden sm:inline"> Add Member</span>
-          <span className="sm:hidden"> Member</span>
+          <span className="sm:hidden"> Add</span>
         </button>
+
+        {onLogout && (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="py-1.5 px-2.5 sm:px-3 rounded-xl border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 active:scale-95 font-bold text-xs shadow-xs transition-all flex items-center space-x-1.5 shrink-0 cursor-pointer"
+            title="Sign Out of Account"
+          >
+            <span>🚪</span>
+            <span>Logout</span>
+          </button>
+        )}
       </div>
     </header>
   );

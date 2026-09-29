@@ -249,52 +249,7 @@ export const Navbar = ({ isCollapsed, onAddMemberClick }) => {
           )}
         </div>
 
-        {/* Demo Role Switcher Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#F5F7FD] hover:bg-[#EEF0FE] border border-[#E5E9F7] rounded-xl transition-all"
-          >
-            <div className="text-left hidden sm:block">
-              <div className="text-[10px] font-mono text-[#94A3B8] uppercase">Role Demo</div>
-              <div className="text-xs font-bold text-[#584CF4]">{currentUser.role}</div>
-            </div>
-            <IconChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
-          </button>
 
-          {roleDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white border border-[#E5E9F7] rounded-2xl shadow-2xl p-2 z-50">
-              <div className="px-3 py-1.5 text-[10px] font-mono text-[#94A3B8] uppercase tracking-wider">
-                Switch Role
-              </div>
-              {[
-                { role: 'Admin', name: 'Alex Mercer', desc: 'Full ERP & Financial Control' },
-                { role: 'Trainer', name: 'Viktor Vance', desc: 'Clients, Workouts & Schedules' },
-                { role: 'Member', name: 'Elena Rostova', desc: 'Smart App, Pass & Macros' },
-                { role: 'Receptionist', name: 'Maya Lin', desc: 'Front Desk & QR Turnstile' }
-              ].map((r) => (
-                <button
-                  key={r.role}
-                  onClick={() => {
-                    switchRole(r.role);
-                    setRoleDropdownOpen(false);
-                  }}
-                  className={`w-full text-left p-2.5 rounded-xl text-xs transition-all flex items-center justify-between ${
-                    currentUser.role === r.role
-                      ? 'bg-[#EEF0FE] text-[#584CF4] font-bold border border-[#584CF4]/30'
-                      : 'text-[#475569] hover:bg-[#F5F7FD] hover:text-[#111827]'
-                  }`}
-                >
-                  <div>
-                    <div className="font-semibold">{r.role} — {r.name}</div>
-                    <div className="text-[10px] text-[#94A3B8] font-normal">{r.desc}</div>
-                  </div>
-                  {currentUser.role === r.role && <IconCheck className="w-4 h-4 text-[#584CF4]" />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Global Logout Button */}
         <button
