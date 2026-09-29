@@ -9,8 +9,8 @@
     "frontend": "npm run start --prefix gms-frontened",
     "backend": "npm run start --prefix backend",
     "build": "npm run install:all && npm run build --prefix gms-frontened",
-    "install:all": "npm install --prefix backend && npm install --prefix gms-frontened",
-    "render-build": "npm install --prefix backend && npm install --prefix gms-frontened && npm run build --prefix gms-frontened",
+    "install:all": "npm --prefix backend install --no-save && npm --prefix gms-frontened install --no-save",
+    "render-build": "npm --prefix backend install --no-save && npm --prefix gms-frontened install --no-save && npm --prefix gms-frontened run build",
     "seed": "npm run seed --prefix backend"
   }
 }

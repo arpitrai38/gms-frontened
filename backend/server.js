@@ -1601,8 +1601,8 @@ app.use((err, req, res, next) => {
 });
 
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Multi-Role Gym Backend API running on http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Multi-Role Gym Backend API running on http://0.0.0.0:${PORT}`);
 });
 
 server.on('error', (err) => {
