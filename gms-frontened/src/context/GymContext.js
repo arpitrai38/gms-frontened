@@ -304,6 +304,48 @@ export const GymProvider = ({ children }) => {
     }
   };
 
+  // Membership Plans CRUD
+  const addPlan = async (planData) => {
+    try {
+      const res = await plansAPI.create(planData);
+      if (res.success && res.data) {
+        setPlans(prev => [...prev, res.data]);
+        return res;
+      }
+      return res;
+    } catch (e) {
+      console.error(e);
+      return { success: false, message: e.message };
+    }
+  };
+
+  const updatePlan = async (id, planData) => {
+    try {
+      const res = await plansAPI.update(id, planData);
+      if (res.success && res.data) {
+        setPlans(prev => prev.map(p => (p._id === id || p.id === id ? res.data : p)));
+        return res;
+      }
+      return res;
+    } catch (e) {
+      console.error(e);
+      return { success: false, message: e.message };
+    }
+  };
+
+  const deletePlan = async (id) => {
+    try {
+      const res = await plansAPI.delete(id);
+      if (res.success) {
+        setPlans(prev => prev.filter(p => p._id !== id && p.id !== id));
+      }
+      return res;
+    } catch (e) {
+      console.error(e);
+      return { success: false, message: e.message };
+    }
+  };
+
   // Payments & Billing
   const recordPayment = async (paymentData) => {
     try {
@@ -431,6 +473,9 @@ export const GymProvider = ({ children }) => {
       deleteTrainer,
 
       plans,
+      addPlan,
+      updatePlan,
+      deletePlan,
 
       payments,
       recordPayment,

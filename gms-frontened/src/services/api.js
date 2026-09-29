@@ -208,8 +208,19 @@ export const membershipsAPI = {
       method: 'POST',
       body: JSON.stringify({ ...data, gymId: data.gymId || gymId })
     });
-  }
+  },
+  update: (id, data) =>
+    request(`/memberships/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }),
+  delete: (id) =>
+    request(`/memberships/${id}`, {
+      method: 'DELETE'
+    })
 };
+
+export const plansAPI = membershipsAPI;
 
 export const attendanceAPI = {
   getToday: () => request('/attendance/today'),

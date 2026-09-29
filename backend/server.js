@@ -949,6 +949,141 @@ app.put('/api/trainers/:id/password', async (req, res) => {
 });
 
 // -------------------------------------------------------------
+// MEMBERSHIP PACKAGES & PLANS (Admin Add, List, Update, Delete)
+// -------------------------------------------------------------
+app.get('/api/memberships', async (req, res) => {
+  try {
+    const gymId = getGymId(req);
+    const filter = gymId ? { gymId } : {};
+    let plans = await Membership.find(filter).sort({ months: 1 });
+
+    // If gymId provided and no plans exist yet, provide standard starter packages
+    if (gymId && plans.length === 0) {
+      const defaultPlans = [
+        { gymId, title: '1 Month Standard', months: 1, price: 1000, description: 'Full gym floor access, cardio equipment & locker facility' },
+        { gymId, title: '3 Months Fitness Pro', months: 3, price: 2500, description: 'Quarterly training with personal trainer fitness consultation' },
+        { gymId, title: '6 Months Transformation', months: 6, price: 4500, description: 'Half-yearly pass with custom workout splits & diet guidance' },
+        { gymId, title: '12 Months Annual VIP', months: 12, price: 8000, description: 'All-inclusive annual VIP access with 2 free guest passes per month' }
+      ];
+      plans = await Membership.insertMany(defaultPlans);
+    }
+
+    res.json({ success: true, data: plans });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.post('/api/memberships', async (req, res) => {
+  try {
+    const gymId = getGymId(req) || req.body.gymId;
+    if (!gymId) {
+      return res.status(400).json({ success: false, message: 'Gym ID is required' });
+    }
+
+    const { title, months, price, description } = req.body;
+    if (!title || !title.trim()) {
+      return res.status(400).json({ success: false, message: 'Plan title is required' });
+    }
+
+    const numMonths = Number(months);
+    const numPrice = Number(price);
+
+    if (isNaN(numMonths) || numMonths <= 0) {
+      return res.status(400).json({ success: false, message: 'Duration must be at least 1 month' });
+    }
+
+    if (isNaN(numPrice) || numPrice < 0) {
+      return res.status(400).json({ success: false, message: 'Price cannot be negative' });
+    }
+
+    const newPlan = await Membership.create({
+      gymId,
+      title: title.trim(),
+      months: numMonths,
+      price: numPrice,
+      description: description ? description.trim() : 'Full gym floor & equipment access'
+    });
+
+    res.json({
+      success: true,
+      message: `Membership plan '${newPlan.title}' created successfully!`,
+      data: newPlan
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.put('/api/memberships/:id', async (req, res) => {
+  try {
+    const { title, months, price, description } = req.body;
+    const updateData = {};
+
+    if (title !== undefined) {
+      if (!title.trim()) {
+        return res.status(400).json({ success: false, message: 'Plan title cannot be empty' });
+      }
+      updateData.title = title.trim();
+    }
+
+    if (months !== undefined) {
+      const numMonths = Number(months);
+      if (isNaN(numMonths) || numMonths <= 0) {
+        return res.status(400).json({ success: false, message: 'Duration must be at least 1 month' });
+      }
+      updateData.months = numMonths;
+    }
+
+    if (price !== undefined) {
+      const numPrice = Number(price);
+      if (isNaN(numPrice) || numPrice < 0) {
+        return res.status(400).json({ success: false, message: 'Price cannot be negative' });
+      }
+      updateData.price = numPrice;
+    }
+
+    if (description !== undefined) {
+      updateData.description = description.trim();
+    }
+
+    const updated = await Membership.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { returnDocument: 'after' }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Membership plan not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Membership plan updated successfully!',
+      data: updated
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.delete('/api/memberships/:id', async (req, res) => {
+  try {
+    const deleted = await Membership.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: 'Membership plan not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Membership plan removed successfully!'
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// -------------------------------------------------------------
 // 2. DASHBOARD STATS (Scoped to Gym)
 // -------------------------------------------------------------
 app.get('/api/dashboard/stats', async (req, res) => {
