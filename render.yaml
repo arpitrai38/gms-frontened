@@ -1,9 +1,11 @@
 services:
   - type: web
     name: gym-management-platform
-    env: node
+    runtime: node
     plan: free
     region: oregon
+    autoDeploy: true
+    healthCheckPath: /
     buildCommand: npm run render-build
     startCommand: npm start
     envVars:
@@ -14,11 +16,10 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://sadhanamarendra12_db_user:ArpitRai_12345@cluster0.b96elmj.mongodb.net/gym_management?retryWrites=true&w=majority&appName=Cluster0
       - key: MONGO_URI
-        sync: false
+        value: mongodb+srv://sadhanamarendra12_db_user:ArpitRai_12345@cluster0.b96elmj.mongodb.net/gym_management?retryWrites=true&w=majority&appName=Cluster0
       - key: EMAIL_USER
-        sync: false
+        value: sadhanamarendra12@gmail.com
       - key: EMAIL_PASS
-        sync: false
-
+        value: ooer pznc ydfz iwvr
